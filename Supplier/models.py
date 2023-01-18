@@ -1,27 +1,26 @@
-from importlib.metadata import requires
 from queue import Empty
-from warnings import catch_warnings
 from django.db import models
 from django.utils.translation import gettext as _
-from setuptools import Require
 from multiselectfield import MultiSelectField
+from django.conf import settings
+
+class Fields(models.TextChoices):
+    Singer = 'Singer', _('Singer')
+    Dancer = 'Dancer', _('Dancer')
+    Actor_Actress = 'Actor/Actress', _('Actor/Actress')
+    Rapper = 'Rapper', _('Rapper')
+    DJ = 'DJ', _('DJ')
+    Music_Producer = 'Music Producer', _('Music Producer')
+    Director = 'Director', _('Director')
+    Entertaiment = 'Entertaiment', _('Entertaiment')
+    Content_Creator = 'Content Creator', _('Content Creator')
+    Gymer_Fitness = 'Gymer/Fitness', _('Gymer/Fitness')
+    Teacher_Coach = 'Teacher/ Coach', _('Teacher/ Coach')
+    Model = 'Model', _('Model')
+    Interior_House = 'Interior house', _('Interior house')
+    Footballer = 'Footballer', _('Footballer')
 
 # Create your models here.
-Fields = ((1, 'Singer'),
-               (2, 'Dancer'),
-               (3, 'Actor/Actress'),
-               (4, 'Rapper'),
-               (5, 'DJ'),
-               (6, 'Music Producer'),
-               (7, 'Director'),
-               (8, 'Entertaiment'),
-               (9, 'Content Creator'),
-               (10, 'Gymer/Fitness'),
-               (11, 'Teacher/ Coach'),
-               (12, 'Model'),
-               (13, 'Interior house'),
-               (14, 'Footballer'),
-               )
 
 # Footballer
 # Beauty/Make up
@@ -63,17 +62,17 @@ Fields = ((1, 'Singer'),
 
 
 class SupplierChannel(models.TextChoices):
-    FB_COMMUNITY = 'FB_COM', _('Facebook Community')
-    FB_PERSONAL = 'FB_PER', _('Facebook Personal')
-    TIKTOK_COMMUNITY = 'TIK_COM', _('Tiktok Community')
-    TIKTOK_PERSONAL = 'TIK_PER', _('Tiktok Personal')
-    YOUTUBE_COMMUNITY = 'YOU_COM', _('Youtube Community')
-    YOUTUBE_PERSONAL = 'YOU_PER', _('Youtube Personal')
-    INSTAGRAM = 'INST', _('Instagram')
-    FORUM = 'FORUM', _('Forum')
-    WEBSITE = 'WEBSITE', _('Website')
-    LINKED_IN = 'LINKEDIN', _('Linkedin')
-    OTHERS = 'OTHERS', _('Others')
+    FB_COMMUNITY = 'Facebook Community', _('Facebook Community')
+    FB_PERSONAL = 'Facebook Personal', _('Facebook Personal')
+    TIKTOK_COMMUNITY = 'Tiktok Community', _('Tiktok Community')
+    TIKTOK_PERSONAL = 'Tiktok Personal', _('Tiktok Personal')
+    YOUTUBE_COMMUNITY = 'Youtube Community', _('Youtube Community')
+    YOUTUBE_PERSONAL = 'Youtube Personal', _('Youtube Personal')
+    INSTAGRAM = 'Instagram', _('Instagram')
+    FORUM = 'Forum', _('Forum')
+    WEBSITE = 'Website', _('Website')
+    LINKED_IN = 'Linkedin', _('Linkedin')
+    OTHERS = 'Others', _('Others')
 
 class Location(models.TextChoices):
     HCM = 'HCM', _('Hồ Chí Minh')
@@ -92,13 +91,13 @@ class Supplier(models.Model):
     #no = models.IntegerField() # todo: auto increase
     name = models.CharField(max_length=100)
     link = models.CharField(max_length=300)
-    channel = models.CharField(max_length=8, choices=SupplierChannel.choices, )
+    channel = models.CharField(max_length=18, choices=SupplierChannel.choices, )
     follower = models.CharField(max_length=20) # 17k -> 17000, 17M -> 17000000 
     engagement_rate_percent = models.CharField(max_length=10)
     location = models.CharField(max_length=3, choices=Location.choices, default=Location.HCM, )
     year_of_birth = models.CharField(max_length=4)
     gender = models.CharField(max_length=2, choices=Gender.choices, default=Gender.Male, )
-    fields = MultiSelectField(choices=Fields, max_choices=10, max_length=500)
+    fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500)
     #ORIGINAL COST
     original_cost_picture = models.CharField(max_length=50, null=True, blank=True)
     original_cost_video = models.CharField(max_length=50, null=True, blank=True)
@@ -114,7 +113,7 @@ class Supplier(models.Model):
     booking_contact_email = models.CharField(max_length=50, null=True, blank=True)
 
     #LATEST UPDATE
-    latest_update = models.DateTimeField(auto_now_add=True)
+    latest_update = models.DateTimeField()
     #HANDLE BY
     handle_by = models.CharField(max_length=100, blank=True)
     #GROUP CHAT NAME
@@ -125,6 +124,7 @@ class Supplier(models.Model):
     lana_leader = models.BooleanField(default=False)
     #History
     history = models.DateTimeField(auto_now_add=True)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
 
 
     def follower_value(self):
@@ -190,3 +190,34 @@ class Supplier(models.Model):
         return "{0}".format(round(engagement_rate_absolute, 2))
     
     engagement_rate_absolute_display.fget.short_description = 'Engagement rate absolute'
+
+    def parse_to_json(self):
+        return {
+            'name': self.name,
+            'link': self.link,
+            'channel': self.channel,
+            'follower': self.follower,
+            'engagement_rate_percent': self.engagement_rate_percent,
+            'location': self.location,
+            'year_of_birth': self.year_of_birth,
+            'gender': self.gender,
+            'fields': self.fields,
+            'original_cost_picture': self.original_cost_picture,
+            'original_cost_video':self.original_cost_video,
+            'original_cost_event':self.original_cost_event,
+            'kpi': self.kpi,
+            'discount': self.discount,
+            'supplier_name': self.supplier_name,
+            'booking_contact_name': self.booking_contact_name,
+            'booking_contact_phone': self.booking_contact_phone,
+            'booking_contact_email': self.booking_contact_email,
+            'latest_update': self.latest_update.strftime('%Y-%m-%d %H:%M'),
+            'handle_by': self.handle_by,
+            'group_chat_name': self.group_chat_name,
+            'kenh': self.kenh,
+            'lana_leader': self.lana_leader
+        }
+
+
+class ExcelFile(models.Model):
+    file = models.FileField(upload_to="excel")
