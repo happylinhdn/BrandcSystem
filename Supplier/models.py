@@ -5,82 +5,7 @@ from django.utils.translation import gettext as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
-
-class Fields(models.TextChoices):
-    Singer = 'Singer', _('Singer')
-    Rapper = 'Rapper', _('Rapper')
-    DJ = 'DJ', _('DJ')
-    Music_Producer = 'Music Producer', _('Music Producer')
-    Dancer = 'Dancer', _('Dancer')
-    Streamer = 'Streamer', _('Streamer')
-    Content_Creator = 'Content Creator', _('Content Creator')
-    Reviewer = 'Reviewer', _('Reviewer')
-    Footballer = 'Footballer', _('Footballer')
-    Gymer_Fitness = 'Gymer/Fitness', _('Gymer/Fitness')
-    Model = 'Model', _('Model')
-    Showbiz = 'Showbiz', _('Showbiz')
-    Make_up = 'Make-up', _('Make-up')
-    Cosmestic_Skincare = 'Cosmestic/Skincare', _('Cosmestic/Skincare')
-    Fashion = 'Fashion', _('Fashion')
-    Travel = 'Travel', _('Travel')
-    Lifestyle = 'Lifestyle', _('Lifestyle')
-    News = 'News', _('News')
-    Education = 'Education', _('Education')
-    Teacher_Coach = 'Teacher/Coach', _('Teacher/Coach')
-    Office_staff = 'Office staff', _('Office staff')
-    Freelancer = 'Freelancer', _('Freelancer')
-    Business = 'Business', _('Business')
-    Architect = 'Architect', _('Architect')
-    Smarthome = 'Smarthome', _('Smarthome')
-    Home_Appliance = 'Home appliance', _('Home appliance')
-    Interior_House = 'Interior house', _('Interior house')
-    Decor_Design = 'Decor & Design', _('Decor & Design')
-    Investment = 'Investment', _('Investment')
-    Insurance = 'Insurance', _('Insurance')
-    Economics_Law = 'Economics & Law', _('Economics & Law')
-    Capital_Market  = 'Capital Market ', _('Capital Market ')
-    Banking = 'Banking', _('Banking')
-    Kid = 'Kid', _('Kid')
-    Hot_Mom_Dad = 'Hot Mom/Dad', _('Hot Mom/Dad')
-    Automotive = 'Automotive', _('Automotive')
-    Director = 'Director', _('Director')
-    Actor_Actress = 'Actor/Actress', _('Actor/Actress')
-    Health_Medicine = 'Health & Medicine', _('Health & Medicine')
-    Youth_GenZ = 'Youth & GenZ', _('Youth & GenZ')
-    Media_Advertisement = 'Media & Advertisement', _('Media & Advertisement')
-    Game_Esport = 'Game & Esport', _('Game & Esport')
-    MC_Editor = 'MC & Editor', _('MC & Editor')
-    Food_Drink = 'Food & Drink', _('Food & Drink')
-    Technology_Ecommerce = 'Technology & Ecommerce', _('Technology & Ecommerce')
-    Celeb = 'Celeb', _('Celeb')
-    General = 'General', _('General')
-    Other = 'Other', _('Other')
-    
-class SupplierChannel(models.TextChoices):
-    FB_COMMUNITY = 'Facebook Community', _('Facebook Community')
-    FB_PERSONAL = 'Facebook Personal', _('Facebook Personal')
-    TIKTOK_COMMUNITY = 'Tiktok Community', _('Tiktok Community')
-    TIKTOK_PERSONAL = 'Tiktok Personal', _('Tiktok Personal')
-    YOUTUBE_COMMUNITY = 'Youtube Community', _('Youtube Community')
-    YOUTUBE_PERSONAL = 'Youtube Personal', _('Youtube Personal')
-    INSTAGRAM = 'Instagram', _('Instagram')
-    FORUM = 'Forum', _('Forum')
-    WEBSITE = 'Website', _('Website')
-    LINKED_IN = 'Linkedin', _('Linkedin')
-    OTHERS = 'Others', _('Others')
-
-class Location(models.TextChoices):
-    HCM = 'HCM', _('Hồ Chí Minh')
-    HN = 'HN', _('Hà Nội')
-
-class Gender(models.TextChoices):
-    Male = 'Ma', _('Male')
-    Female = 'Fe', _('Female')
-
-class Kenh(models.TextChoices):
-    Zalo = 'za', _('Zalo')
-    Viber = 'vi', _('Viber')
-    Facebook = 'fb', _('Facebook')
+from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
 
 class Supplier(models.Model):
     #no = models.IntegerField() # todo: auto increase
@@ -91,11 +16,11 @@ class Supplier(models.Model):
     follower_2 = models.FloatField(editable=False, null=True, blank=True)
     kol_tier = models.CharField(max_length=20, editable=False, null=True, blank=True)
 
-    engagement_rate_percent = models.FloatField(verbose_name='ER(%)', max_length=10)
-    engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', max_length=20, editable=False, null=True, blank=True)
+    engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
+    engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True, blank=True)
     engagement_rate_absolute_display = models.CharField(verbose_name='ER (Ab.)', max_length=20, editable=False, null=True, blank=True)
 
-    location = models.CharField(max_length=3, choices=Location.choices, default=Location.HCM, )
+    location = models.CharField(max_length=3, choices=Location.choices, default=Location.SG, )
     year_of_birth = models.IntegerField(
         default=1900,
         validators=[
@@ -218,6 +143,9 @@ class Supplier(models.Model):
             #         break
 
         super(Supplier, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
         
     def parse_to_json(self):

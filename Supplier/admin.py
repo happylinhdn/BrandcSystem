@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Supplier, Fields
+from .models import Supplier
+from .supportmodels import Fields
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext as _
 
@@ -32,7 +33,7 @@ class SupplierAdmin(admin.ModelAdmin):
     'kpi', 'discount', 'supplier_name', 'booking_contact_display', 'profile_quotation', 'latest_update', 'handle_by', 'group_chat_name',
     'group_chat_channel', 'lana_leader' , 'modified_by'
     ]
-    list_filter = [FieldsFilter, 'kol_tier', 'gender', 'channel', 'location', 'year_of_birth']
+    list_filter = ['kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
     search_fields = ['name', 'link']
 
     def kol_tier_2(self, inst):
