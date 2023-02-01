@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from queue import Empty
 from django.db import models
 from django.utils.translation import gettext as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
+from django.utils.html import format_html
 
 class Supplier(models.Model):
     #no = models.IntegerField() # todo: auto increase
@@ -13,7 +13,7 @@ class Supplier(models.Model):
     link = models.CharField(max_length=300)
     channel = models.CharField(max_length=18, choices=SupplierChannel.choices, )
     follower = models.CharField(max_length=20) # 17k -> 17000, 17M -> 17000000 
-    follower_2 = models.FloatField(editable=False, null=True, blank=True)
+    follower_2 = models.DecimalField(editable=False, null=True, blank=True, decimal_places=0, max_digits=20,)
     kol_tier = models.CharField(max_length=20, editable=False, null=True, blank=True)
 
     engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
@@ -30,14 +30,14 @@ class Supplier(models.Model):
     gender = models.CharField(max_length=2, choices=Gender.choices, default=Gender.Male, )
     fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500)
     #ORIGINAL COST
-    original_cost_picture = models.FloatField(verbose_name='ORIGINAL COST - PICTURE', null=True, blank=True)
-    original_cost_video = models.FloatField(verbose_name='ORIGINAL COST - VIDEO', null=True, blank=True)
-    original_cost_event = models.FloatField(verbose_name='ORIGINAL COST - EVENT',  null=True, blank=True)
-    original_cost_tvc = models.FloatField(verbose_name='ORIGINAL COST - TVC', null=True, blank=True)
-    kpi = models.FloatField(verbose_name='KPI',max_length=50, null=True, blank=True)
+    original_cost_picture = models.DecimalField(verbose_name='ORIGINAL COST - PICTURE', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_video = models.DecimalField(verbose_name='ORIGINAL COST - VIDEO', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_event = models.DecimalField(verbose_name='ORIGINAL COST - EVENT', decimal_places=0, max_digits=20,  null=True, blank=True)
+    original_cost_tvc = models.DecimalField(verbose_name='ORIGINAL COST - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
+    kpi = models.CharField(verbose_name='KPI', max_length=50, null=True, blank=True)
 
     #DISCOUNT, SUPPLIER NAME
-    discount = models.FloatField(max_length=50, null=True, blank=True)
+    discount = models.CharField(max_length=50, null=True, blank=True)
     supplier_name = models.CharField(max_length=100, null=True, blank=True)
 
     #BOOKING CONTACT: Name, Phone, Email
@@ -121,27 +121,23 @@ class Supplier(models.Model):
         return "{0}".format(round(engagement_rate_absolute, 2))
 
     @property
-    def booking_contact_display(self):
-        return """Name:{0} - Phone: {1} - Email:{2}""".format(self.booking_contact_name, self.booking_contact_phone, self.booking_contact_email)
+    def year_display(self):
+        if self.year_of_birth:
+            return "{0}".format(self.year_of_birth)
+        return "-"
+    year_display.fget.short_description = 'Year'
 
-    booking_contact_display.fget.short_description = 'Booking contact'
+    
+    @property
+    def channel_display(self):
+        return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=self.link, name=self.channel)
+    channel_display.fget.short_description = 'Channel'
 
     def save(self, *args, **kwargs):
         self.follower_2 = self.follower_value()
         self.kol_tier = self.kol_tier_detect()
         self.engagement_rate_absolute = self.engagement_rate_absolute_calc()
         self.engagement_rate_absolute_display = self.engagement_rate_absolute_display_calc() 
-
-        all_choices = Fields.choices
-        t_data = [c.fields for c in Supplier.objects.all()]
-        result = ()
-        for choice in all_choices:
-            print(choice[1])
-            # for t in t_data:
-            #     if choice.value() in t:
-            #         result.append(choice)
-            #         break
-
         super(Supplier, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -174,7 +170,6 @@ class Supplier(models.Model):
             'kenh': self.kenh,
             'lana_leader': self.lana_leader
         }
-
 
 class ExcelFile(models.Model):
     file = models.FileField(upload_to="excel")
