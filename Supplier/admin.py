@@ -1,9 +1,7 @@
 from django.contrib import admin
 from .models import Supplier
-from .supportmodels import Fields
-from .list_filters import FieldsFilter
+from .list_filters import FieldsFilter, CostRangeFilter
 
-from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext as _
 from django import forms
 
@@ -40,7 +38,7 @@ class SupplierAdmin(admin.ModelAdmin):
     'group_chat_channel', 'lana_leader' , 'modified_by'
     ]
     list_display_links  = ['name',]
-    list_filter = ['kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
+    list_filter = [CostRangeFilter, 'kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
     search_fields = ['name', 'link']
     list_per_page = 25
 
