@@ -1,8 +1,8 @@
-
-from django import forms
+from django.forms import ModelForm, MultipleChoiceField
 from .models import Supplier
+from .supportmodels import Fields
 
-class SupplierForm(forms.ModelForm):
+class SupplierForm(ModelForm):
     class Meta:
         model = Supplier
         fields = '__all__'

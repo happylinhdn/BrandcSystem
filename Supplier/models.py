@@ -28,6 +28,7 @@ class Supplier(models.Model):
             MinValueValidator(1900)
         ], blank=True)
     gender = models.CharField(max_length=2, choices=Gender.choices, default=Gender.Male, )
+    
     fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500)
     #ORIGINAL COST
     original_cost_picture = models.DecimalField(verbose_name='ORIGINAL COST - PICTURE', decimal_places=0, max_digits=20, null=True, blank=True)
