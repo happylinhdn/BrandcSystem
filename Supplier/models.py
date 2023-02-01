@@ -45,7 +45,8 @@ class Supplier(models.Model):
     booking_contact_phone = models.CharField(max_length=15, null=True, blank=True)
     booking_contact_email = models.CharField(max_length=50, null=True, blank=True)
 
-    profile_quotation = models.CharField(verbose_name='PROFILE/QUOTATION', max_length=50, null=True, blank=True)
+    profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
+
     latest_update = models.DateTimeField()
     #HANDLE BY
     handle_by = models.CharField(max_length=100, blank=True)
