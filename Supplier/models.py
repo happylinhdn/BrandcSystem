@@ -147,30 +147,38 @@ class Supplier(models.Model):
         
     def parse_to_json(self):
         return {
-            'name': self.name,
-            'link': self.link,
-            'channel': self.channel,
-            'follower': self.follower,
-            'engagement_rate_percent': self.engagement_rate_percent,
-            'location': self.location,
-            'year_of_birth': self.year_of_birth,
-            'gender': self.gender,
-            'fields': self.fields,
-            'original_cost_picture': self.original_cost_picture,
-            'original_cost_video':self.original_cost_video,
-            'original_cost_event':self.original_cost_event,
-            'kpi': self.kpi,
-            'discount': self.discount,
-            'supplier_name': self.supplier_name,
-            'booking_contact_name': self.booking_contact_name,
-            'booking_contact_phone': self.booking_contact_phone,
-            'booking_contact_email': self.booking_contact_email,
-            'latest_update': self.latest_update.strftime('%Y-%m-%d %H:%M'),
-            'handle_by': self.handle_by,
-            'group_chat_name': self.group_chat_name,
-            'kenh': self.kenh,
-            'lana_leader': self.lana_leader
+            'NAME': self.name,
+            'LINK': self.link,
+            'CHANNEL': self.channel,
+            'FOLLOWER': self.follower,
+            'KOL TIER': self.kol_tier,
+            'ER(%)': self.engagement_rate_percent,
+            'ER(AB.)': self.engagement_rate_absolute_display,
+            'LOCATION': self.location,
+            'YEAR': self.year_of_birth,
+            'GENDER': self.gender,
+            'FIELDS': self.fields,
+            'ORIGINAL COST - PICTURE': self.original_cost_picture,
+            'ORIGINAL COST - VIDEO':self.original_cost_video,
+            'ORIGINAL COST - EVENT':self.original_cost_event,
+            'ORIGINAL COST - TVC':self.original_cost_tvc,
+            'KPI': self.kpi,
+            'DISCOUNT': self.discount,
+            'SUPPLIER NAME': self.supplier_name,
+            'BOOKING CONTACT NAME': self.booking_contact_name,
+            'BOOKING CONTACT PHONE': self.booking_contact_phone,
+            'BOOKING CONTACT EMAIL': self.booking_contact_email,
+            'LATEST UPDATE': self.latest_update.strftime('%Y-%m-%d %H:%M'),
+            'HANDLE BY': self.handle_by,
+            'GROUP CHAT NAME': self.group_chat_name,
+            'GROUP CHAT CHANNEL': self.group_chat_channel,
+            'LANA LEADER': self.lana_leader
         }
+    class Meta:
+        permissions = [
+            ("export_excel_as_staff", "Can export excel with limit 100 records"),
+            ("export_excel_as_admin", "Can export excel with limit 1000 records")
+        ]
 
 class ExcelFile(models.Model):
     file = models.FileField(upload_to="excel")

@@ -1,20 +1,13 @@
 from django.contrib import admin
+from django.utils.translation import gettext as _
 from .models import Supplier
 from .list_filters import FieldsFilter, CostRangeFilter
-
-from django.utils.translation import gettext as _
-from django import forms
-
+from .forms import SupplierForm
+from .actions import ExportCsvMixin
 
 # Register your models here.
-class SupplierForm(forms.ModelForm):
-    class Meta:
-        model = Supplier
-        fields = '__all__'
-        localized_fields = ['original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc']
-
 @admin.register(Supplier)
-class SupplierAdmin(admin.ModelAdmin):
+class SupplierAdmin(admin.ModelAdmin, ExportCsvMixin):
     class Media:
         css = {
             'all': ('css/fancy.css',)
@@ -41,6 +34,7 @@ class SupplierAdmin(admin.ModelAdmin):
     list_filter = [CostRangeFilter, 'kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
     search_fields = ['name', 'link']
     list_per_page = 25
+    actions = ["export_as_xls"]
 
     
     def booking_contact(self, obj):
