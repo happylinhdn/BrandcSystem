@@ -18,7 +18,6 @@ class Supplier(models.Model):
 
     engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
     engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True, blank=True)
-    engagement_rate_absolute_display = models.CharField(verbose_name='ER (Ab.)', max_length=20, editable=False, null=True, blank=True)
 
     location = models.CharField(max_length=3, choices=Location.choices, default=Location.SG, )
     year_of_birth = models.IntegerField(
@@ -112,23 +111,21 @@ class Supplier(models.Model):
         return follower_value * rate/100
 
     def engagement_rate_absolute_display_calc(self):
-        engagement_rate_absolute = self.engagement_rate_absolute_calc()
-        if engagement_rate_absolute >= 1000000:
-            temp = engagement_rate_absolute/1000000
+        if self.engagement_rate_absolute >= 1000000:
+            temp = self.engagement_rate_absolute/1000000
             return "{0}M".format(round(temp, 2))
         
-        if engagement_rate_absolute >= 1000:
-            temp = engagement_rate_absolute/1000
+        if self.engagement_rate_absolute >= 1000:
+            temp = self.engagement_rate_absolute/1000
             return "{0}K".format(round(temp, 2))
         
-        return "{0}".format(round(engagement_rate_absolute, 2))
+        return "{0}".format(round(self.engagement_rate_absolute, 2))
 
 
     def save(self, *args, **kwargs):
         self.follower_2 = self.follower_value()
         self.kol_tier = self.kol_tier_detect()
-        self.engagement_rate_absolute = self.engagement_rate_absolute_calc()
-        self.engagement_rate_absolute_display = self.engagement_rate_absolute_display_calc() 
+        self.engagement_rate_absolute = self.engagement_rate_absolute_calc() 
         super(Supplier, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -137,36 +134,42 @@ class Supplier(models.Model):
         
     def parse_to_json(self):
         return {
-            'NAME': self.name,
-            'LINK': self.link,
-            'CHANNEL': self.channel,
-            'FOLLOWER': self.follower,
-            'KOL TIER': self.kol_tier,
-            'ER(%)': self.engagement_rate_percent,
-            'ER(AB.)': self.engagement_rate_absolute_display,
-            'LOCATION': self.location,
-            'YEAR': self.year_of_birth,
-            'GENDER': self.gender,
-            'FIELDS': self.fields,
-            'ORIGINAL COST - PICTURE': self.original_cost_picture,
-            'ORIGINAL COST - VIDEO':self.original_cost_video,
-            'ORIGINAL COST - EVENT':self.original_cost_event,
-            'ORIGINAL COST - TVC':self.original_cost_tvc,
-            'KPI': self.kpi,
-            'DISCOUNT': self.discount,
-            'SUPPLIER NAME': self.supplier_name,
-            'BOOKING CONTACT NAME': self.booking_contact_name,
-            'BOOKING CONTACT PHONE': self.booking_contact_phone,
-            'BOOKING CONTACT EMAIL': self.booking_contact_email,
-            'PROFILE/QUOTATION': self.profile,
-            'LATEST UPDATE': self.latest_update.strftime('%Y-%m-%d %H:%M'),
-            'HANDLE BY': self.handle_by,
-            'GROUP CHAT NAME': self.group_chat_name,
-            'GROUP CHAT CHANNEL': self.group_chat_channel,
-            'LANA LEADER': self.lana_leader
+            'id': self.id,
+            'name': self.name,
+            'link': self.link,
+            'channel': self.channel,
+            'follower': self.follower,
+            'kol_tier': self.kol_tier,
+            'engagement_rate_percent': self.engagement_rate_percent,
+            'engagement_rate_absolute': self.engagement_rate_absolute,
+            'location': self.location,
+            'year_of_birth': self.year_of_birth,
+            'gender': self.gender,
+            'fields': self.fields,
+            'original_cost_picture': self.original_cost_picture,
+            'original_cost_video':self.original_cost_video,
+            'original_cost_event':self.original_cost_event,
+            'original_cost_tvc':self.original_cost_tvc,
+            'kpi': self.kpi,
+            'discount': self.discount,
+            'supplier_name': self.supplier_name,
+            'booking_contact_name': self.booking_contact_name,
+            'booking_contact_phone': self.booking_contact_phone,
+            'booking_contact_email': self.booking_contact_email,
+            'profile': self.profile,
+            'latest_update': self.latest_update.strftime('%Y-%m-%d %H:%M'),
+            'handle_by': self.handle_by,
+            'group_chat_name': self.group_chat_name,
+            'group_chat_channel': self.group_chat_channel,
+            'lana_leader': self.lana_leader,
+            'modified_by': self.modified_by.id,
+            'modified_by_name': self.modified_by
         }
+
+     		
     class Meta:
         permissions = [
+            ("import_data_as_admin", "Can import data"),
             ("export_excel_as_staff", "Can export excel with limit 100 records"),
             ("export_excel_as_admin", "Can export excel with limit 1000 records")
         ]

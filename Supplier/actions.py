@@ -63,7 +63,6 @@ class ExportCsvMixin:
         data = []
         for obj in queryset:
             data.append(obj.parse_to_json())
-        #pd.DataFrame(data).to_excel('output.xlsx')
         
 
         excel_file = IO()

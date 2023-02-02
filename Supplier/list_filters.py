@@ -42,35 +42,40 @@ class CostRangeFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         # to decide how to filter the queryset.
         # return queryset.filter(fields__contains=self.value())
+        p10 = 10000000
+        p30 = 30000000
+        p50 = 50000000
+        p70 = 70000000
+        p100 = 100000000
         if self.value() == '1':
-            return queryset.filter(original_cost_picture__lte=10000) \
-                | queryset.filter(original_cost_video__lte=10000) \
-                | queryset.filter(original_cost_event__lte=10000) \
-                | queryset.filter(original_cost_tvc__lte=10000)
+            return queryset.filter(original_cost_picture__lte=p10) \
+                | queryset.filter(original_cost_video__lte=p10) \
+                | queryset.filter(original_cost_event__lte=p10) \
+                | queryset.filter(original_cost_tvc__lte=p10)
 
         if self.value() == '2':
-            return queryset.filter(original_cost_picture__gte=10000, original_cost_picture__lte=30000) \
-                | queryset.filter(original_cost_video__gte=10000, original_cost_video__lte=30000) \
-                | queryset.filter(original_cost_event__gte=10000, original_cost_event__lte=30000) \
-                | queryset.filter(original_cost_tvc__gte=10000, original_cost_tvc__lte=30000) \
+            return queryset.filter(original_cost_picture__gte=p10, original_cost_picture__lte=p30) \
+                | queryset.filter(original_cost_video__gte=p10, original_cost_video__lte=p30) \
+                | queryset.filter(original_cost_event__gte=p10, original_cost_event__lte=p30) \
+                | queryset.filter(original_cost_tvc__gte=p10, original_cost_tvc__lte=p30) \
                 
         if self.value() == '3':
-            return queryset.filter(original_cost_picture__gte=30000, original_cost_picture__lte=50000) \
-                | queryset.filter(original_cost_video__gte=30000, original_cost_video__lte=50000) \
-                | queryset.filter(original_cost_event__gte=30000, original_cost_event__lte=50000) \
-                | queryset.filter(original_cost_tvc__gte=30000, original_cost_tvc__lte=50000)
+            return queryset.filter(original_cost_picture__gte=p30, original_cost_picture__lte=p50) \
+                | queryset.filter(original_cost_video__gte=p30, original_cost_video__lte=p50) \
+                | queryset.filter(original_cost_event__gte=p30, original_cost_event__lte=p50) \
+                | queryset.filter(original_cost_tvc__gte=p30, original_cost_tvc__lte=p50)
         if self.value() == '4':
-            return queryset.filter(original_cost_picture__gte=50000, original_cost_picture__lte=70000) \
-                | queryset.filter(original_cost_video__gte=50000, original_cost_video__lte=70000) \
-                | queryset.filter(original_cost_event__gte=50000, original_cost_event__lte=70000) \
-                | queryset.filter(original_cost_tvc__gte=50000, original_cost_tvc__lte=70000)
+            return queryset.filter(original_cost_picture__gte=p50, original_cost_picture__lte=p70) \
+                | queryset.filter(original_cost_video__gte=p50, original_cost_video__lte=p70) \
+                | queryset.filter(original_cost_event__gte=p50, original_cost_event__lte=p70) \
+                | queryset.filter(original_cost_tvc__gte=p50, original_cost_tvc__lte=p70)
         if self.value() == '5':
-            return queryset.filter(original_cost_picture__gte=70000, original_cost_picture__lte=100000) \
-                | queryset.filter(original_cost_video__gte=70000, original_cost_video__lte=100000) \
-                | queryset.filter(original_cost_event__gte=70000, original_cost_event__lte=100000) \
-                | queryset.filter(original_cost_tvc__gte=70000, original_cost_tvc__lte=100000)
+            return queryset.filter(original_cost_picture__gte=p70, original_cost_picture__lte=p100) \
+                | queryset.filter(original_cost_video__gte=p70, original_cost_video__lte=p100) \
+                | queryset.filter(original_cost_event__gte=p70, original_cost_event__lte=p100) \
+                | queryset.filter(original_cost_tvc__gte=p70, original_cost_tvc__lte=p100)
         if self.value() == '6':
-            return queryset.filter(original_cost_picture__gte=100000) \
-                | queryset.filter(original_cost_video__gte=100000)  \
-                | queryset.filter(original_cost_event__gte=100000) \
-                | queryset.filter(original_cost_tvc__gte=100000) 
+            return queryset.filter(original_cost_picture__gte=p100) \
+                | queryset.filter(original_cost_video__gte=p100)  \
+                | queryset.filter(original_cost_event__gte=p100) \
+                | queryset.filter(original_cost_tvc__gte=p100) 

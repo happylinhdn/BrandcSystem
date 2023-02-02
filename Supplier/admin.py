@@ -4,11 +4,15 @@ from .models import Supplier
 from .list_filters import FieldsFilter, CostRangeFilter
 from .forms import SupplierForm
 from .actions import ExportCsvMixin
+from .resources import SupplierResource
 from django.utils.html import format_html
+from import_export.admin import ExportMixin, ExportActionMixin, ExportActionModelAdmin, ImportExportActionModelAdmin
+from import_export.admin import ImportExportMixin, ImportMixin
+
 
 # Register your models here.
 @admin.register(Supplier)
-class SupplierAdmin(admin.ModelAdmin, ExportCsvMixin):
+class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     class Media:
         css = {
             'all': ('css/fancy.css',)
@@ -70,3 +74,13 @@ class SupplierAdmin(admin.ModelAdmin, ExportCsvMixin):
     def channel_display(self, obj):
         return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=obj.link, name=obj.channel)
     channel_display.short_description = 'Channel'
+
+    def engagement_rate_absolute_display(self, obj):
+        return obj.engagement_rate_absolute_display_calc() 
+    engagement_rate_absolute_display.short_description = 'ER (Ab.)'
+
+    resource_classes = [SupplierResource]
+
+    def has_import_permission(self, request):
+        has_perm = request.user.has_perm('Supplier.import_data_as_admin')
+        return has_perm

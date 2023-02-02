@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'multiselectfield',
     'Supplier',
+    'import_export'
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,6 @@ USE_THOUSAND_SEPARATOR = True
 
 EXPORT_RECORDS_LIMIT = 100
 EXPORT_RECORDS_ADMIN_LIMIT = 1000
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+IMPORT_EXPORT_CHUNK_SIZE = 100
