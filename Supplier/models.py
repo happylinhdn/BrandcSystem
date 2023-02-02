@@ -46,7 +46,8 @@ class Supplier(models.Model):
     booking_contact_phone = models.CharField(max_length=15, null=True, blank=True)
     booking_contact_email = models.CharField(max_length=50, null=True, blank=True)
 
-    profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
+    #profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
+    profile = models.CharField(verbose_name='PROFILE/QUOTATION', max_length=300, null=True, blank=True)
 
     latest_update = models.DateTimeField()
     #HANDLE BY
@@ -122,18 +123,6 @@ class Supplier(models.Model):
         
         return "{0}".format(round(engagement_rate_absolute, 2))
 
-    @property
-    def year_display(self):
-        if self.year_of_birth:
-            return "{0}".format(self.year_of_birth)
-        return "-"
-    year_display.fget.short_description = 'Year'
-
-    
-    @property
-    def channel_display(self):
-        return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=self.link, name=self.channel)
-    channel_display.fget.short_description = 'Channel'
 
     def save(self, *args, **kwargs):
         self.follower_2 = self.follower_value()
@@ -169,6 +158,7 @@ class Supplier(models.Model):
             'BOOKING CONTACT NAME': self.booking_contact_name,
             'BOOKING CONTACT PHONE': self.booking_contact_phone,
             'BOOKING CONTACT EMAIL': self.booking_contact_email,
+            'PROFILE/QUOTATION': self.profile,
             'LATEST UPDATE': self.latest_update.strftime('%Y-%m-%d %H:%M'),
             'HANDLE BY': self.handle_by,
             'GROUP CHAT NAME': self.group_chat_name,
