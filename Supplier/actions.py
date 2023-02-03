@@ -67,7 +67,30 @@ class ExportCsvMixin:
 
         excel_file = IO()
         xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
-        pd.DataFrame(data).to_excel(xlwriter, "Summary", index=False)
+        df = pd.DataFrame(data)
+        df.to_excel(xlwriter, "Summary", index=False)
+
+        # Get the xlsxwriter workbook and worksheet objects.
+        workbook  = xlwriter.book
+        worksheet = xlwriter.sheets['Summary']
+
+        # Set a currency number format for a column.
+        num_format = workbook.add_format({'num_format': '#,###'})
+        for column in df:
+            column_length = max(df[column].astype(str).map(len).max(), len(column))
+            col_idx = df.columns.get_loc(column)
+            print('col_idx')
+            print(col_idx)
+            worksheet.set_column(col_idx, col_idx, column_length)
+
+        worksheet.set_column('J:J', 15)
+        worksheet.set_column('M:M', 15, num_format)
+        worksheet.set_column('N:N', 15, num_format)
+        worksheet.set_column('O:O', 15, num_format)
+        worksheet.set_column('P:P', 15, num_format)
+        
+
+
         xlwriter.save()
         xlwriter.close()
 

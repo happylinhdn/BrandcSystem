@@ -135,10 +135,10 @@ class SupplierChannel(models.TextChoices):
     OTHERS = 'Others', _('Others')
 
 class Gender(models.TextChoices):
-    Male = 'Ma', _('Male')
-    Female = 'Fe', _('Female')
+    Male = 'Male', _('Male')
+    Female = 'Female', _('Female')
 
 class Kenh(models.TextChoices):
-    Zalo = 'za', _('Zalo')
-    Viber = 'vi', _('Viber')
-    Facebook = 'fb', _('Facebook')
+    Zalo = 'Zalo', _('Zalo')
+    Viber = 'Viber', _('Viber')
+    Facebook = 'Facebook', _('Facebook')

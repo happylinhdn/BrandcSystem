@@ -25,7 +25,7 @@ class Supplier(models.Model):
             MaxValueValidator(2030),
             MinValueValidator(1900)
         ])
-    gender = models.CharField(max_length=2, choices=Gender.choices, default=Gender.Male, )
+    gender = models.CharField(max_length=6, choices=Gender.choices, default=Gender.Male, )
     
     fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500)
     #ORIGINAL COST
@@ -53,7 +53,7 @@ class Supplier(models.Model):
     #GROUP CHAT NAME
     group_chat_name = models.CharField(max_length=100)
     #Kênh (Zalo, Viber or Facebook) 
-    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=2, choices=Kenh.choices, default=Kenh.Zalo, )
+    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, default=Kenh.Zalo, )
     #Set Leader Mode to Ms. Lana
     lana_leader = models.BooleanField(default=True)
     #History
@@ -140,15 +140,15 @@ class Supplier(models.Model):
             'FOLLOWER': self.follower,
             'KOL TIER': self.kol_tier,
             'ER(%)': self.engagement_rate_percent,
-            'ER (Ab.)': self.engagement_rate_absolute,
+            'ER (Ab.)': self.engagement_rate_absolute_display_calc(),
             'LOCATION': self.location,
             'YEAR': self.year_of_birth,
             'GENDER': self.gender,
             'FIELDS': self.fields,
-            'ORIGINAL COST - PICTURE': self.original_cost_picture,
-            'ORIGINAL COST - VIDEO':self.original_cost_video,
-            'ORIGINAL COST - EVENT':self.original_cost_event,
-            'ORIGINAL COST - TVC':self.original_cost_tvc,
+            'ORIGINAL COST - PICTURE': int(self.original_cost_picture or 0),
+            'ORIGINAL COST - VIDEO':int(self.original_cost_video or 0),
+            'ORIGINAL COST - EVENT': int(self.original_cost_event or 0),
+            'ORIGINAL COST - TVC':int(self.original_cost_tvc or 0),
             'KPI': self.kpi,
             'DISCOUNT': self.discount,
             'SUPPLIER NAME': self.supplier_name,
