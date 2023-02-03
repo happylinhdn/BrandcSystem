@@ -5,7 +5,6 @@ from multiselectfield import MultiSelectField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
-from django.utils.html import format_html
 
 class Supplier(models.Model):
     #no = models.IntegerField() # todo: auto increase
@@ -13,50 +12,50 @@ class Supplier(models.Model):
     link = models.CharField(max_length=300)
     channel = models.CharField(max_length=18, choices=SupplierChannel.choices, )
     follower = models.CharField(max_length=20) # 17k -> 17000, 17M -> 17000000 
-    follower_2 = models.DecimalField(editable=False, null=True, blank=True, decimal_places=0, max_digits=20,)
-    kol_tier = models.CharField(max_length=20, editable=False, null=True, blank=True)
+    follower_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
+    kol_tier = models.CharField(max_length=20, editable=False, null=True)
 
     engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
-    engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True, blank=True)
+    engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
 
-    location = models.CharField(max_length=3, choices=Location.choices, default=Location.SG, )
+    location = models.CharField(max_length=20, choices=Location.choices, default=Location.SG, )
     year_of_birth = models.IntegerField(
         default=1900,
         validators=[
             MaxValueValidator(2030),
             MinValueValidator(1900)
-        ], blank=True)
+        ])
     gender = models.CharField(max_length=2, choices=Gender.choices, default=Gender.Male, )
     
     fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500)
     #ORIGINAL COST
-    original_cost_picture = models.DecimalField(verbose_name='ORIGINAL COST - PICTURE', decimal_places=0, max_digits=20, null=True, blank=True)
-    original_cost_video = models.DecimalField(verbose_name='ORIGINAL COST - VIDEO', decimal_places=0, max_digits=20, null=True, blank=True)
-    original_cost_event = models.DecimalField(verbose_name='ORIGINAL COST - EVENT', decimal_places=0, max_digits=20,  null=True, blank=True)
-    original_cost_tvc = models.DecimalField(verbose_name='ORIGINAL COST - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
-    kpi = models.CharField(verbose_name='KPI', max_length=50, null=True, blank=True)
+    original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True)
+    original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True)
+    original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True)
+    original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True)
+    kpi = models.CharField(verbose_name='KPI', max_length=50, null=True)
 
     #DISCOUNT, SUPPLIER NAME
-    discount = models.CharField(max_length=50, null=True, blank=True)
-    supplier_name = models.CharField(max_length=100, null=True, blank=True)
+    discount = models.CharField(max_length=50, null=True)
+    supplier_name = models.CharField(max_length=100, null=True)
 
     #BOOKING CONTACT: Name, Phone, Email
-    booking_contact_name = models.CharField(max_length=100, null=True, blank=True)
-    booking_contact_phone = models.CharField(max_length=15, null=True, blank=True)
-    booking_contact_email = models.CharField(max_length=50, null=True, blank=True)
+    booking_contact_name = models.CharField(max_length=100, null=True)
+    booking_contact_phone = models.CharField(max_length=15, null=True)
+    booking_contact_email = models.CharField(max_length=50, null=True)
 
     #profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
-    profile = models.CharField(verbose_name='PROFILE/QUOTATION', max_length=300, null=True, blank=True)
+    profile = models.CharField(verbose_name='Profile/Quatation', max_length=300, null=True)
 
     latest_update = models.DateTimeField()
     #HANDLE BY
-    handle_by = models.CharField(max_length=100, blank=True)
+    handle_by = models.CharField(max_length=100)
     #GROUP CHAT NAME
-    group_chat_name = models.CharField(max_length=100, blank=True)
+    group_chat_name = models.CharField(max_length=100)
     #Kênh (Zalo, Viber or Facebook) 
     group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=2, choices=Kenh.choices, default=Kenh.Zalo, )
     #Set Leader Mode to Ms. Lana
-    lana_leader = models.BooleanField(default=False)
+    lana_leader = models.BooleanField(default=True)
     #History
     history = models.DateTimeField(auto_now_add=True)
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
