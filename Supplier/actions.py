@@ -67,7 +67,7 @@ class ExportCsvMixin:
 
         excel_file = IO()
         xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
-        pd.DataFrame(data).to_excel(xlwriter, "Summary")
+        pd.DataFrame(data).to_excel(xlwriter, "Summary", index=False)
         xlwriter.save()
         xlwriter.close()
 

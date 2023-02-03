@@ -56,6 +56,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     search_fields = ['name', 'link']
     list_per_page = 25
     actions = ["export_as_xls"]
+    ordering = ['id']
 
     
     def booking_contact(self, obj):
