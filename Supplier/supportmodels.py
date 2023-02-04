@@ -122,7 +122,8 @@ class Location(models.TextChoices):
     YB='Yên Bái', _('Yên Bái')
 
 class SupplierChannel(models.TextChoices):
-    FB_COMMUNITY = 'Facebook Community', _('Facebook Community')
+    FB_GROUP = 'Facebook Group', _('Facebook Group')
+    FB_FANPAGE = 'Facebook Fanpage', _('Facebook Fanpage')
     FB_PERSONAL = 'Facebook Personal', _('Facebook Personal')
     TIKTOK_COMMUNITY = 'Tiktok Community', _('Tiktok Community')
     TIKTOK_PERSONAL = 'Tiktok Personal', _('Tiktok Personal')
