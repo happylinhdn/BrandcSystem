@@ -8,9 +8,9 @@ from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
 
 class Supplier(models.Model):
     #no = models.IntegerField() # todo: auto increase
-    name = models.CharField(max_length=100)
-    link = models.CharField(max_length=300)
-    channel = models.CharField(max_length=18, choices=SupplierChannel.choices, )
+    name = models.CharField(max_length=100, null=True)
+    link = models.CharField(max_length=300, null=True)
+    channel = models.CharField(max_length=18, choices=SupplierChannel.choices, null=True)
     follower = models.CharField(max_length=20) # 17k -> 17000, 17M -> 17000000 
     follower_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
     kol_tier = models.CharField(max_length=20, editable=False, null=True)
@@ -18,16 +18,16 @@ class Supplier(models.Model):
     engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
     engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
 
-    location = models.CharField(max_length=20, choices=Location.choices, default=Location.SG, )
+    location = models.CharField(max_length=20, choices=Location.choices, default=Location.SG, null=True )
     year_of_birth = models.IntegerField(
         default=1900,
         validators=[
             MaxValueValidator(2030),
             MinValueValidator(1900)
         ])
-    gender = models.CharField(max_length=6, choices=Gender.choices, default=Gender.Male, )
+    gender = models.CharField(max_length=6, choices=Gender.choices, default=Gender.Male, null=True)
     
-    fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500)
+    fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
     #ORIGINAL COST
     original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True)
     original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True)
@@ -47,17 +47,17 @@ class Supplier(models.Model):
     #profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
     profile = models.CharField(verbose_name='Profile/Quatation', max_length=300, null=True)
 
-    latest_update = models.DateTimeField()
+    latest_update = models.DateTimeField(null=True)
     #HANDLE BY
-    handle_by = models.CharField(max_length=100)
+    handle_by = models.CharField(max_length=100, null=True)
     #GROUP CHAT NAME
-    group_chat_name = models.CharField(max_length=100)
+    group_chat_name = models.CharField(max_length=100, null=True)
     #Kênh (Zalo, Viber or Facebook) 
-    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, default=Kenh.Zalo, )
+    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, default=Kenh.Zalo, null=True)
     #Set Leader Mode to Ms. Lana
     lana_leader = models.BooleanField(default=True)
     #History
-    history = models.DateTimeField(auto_now_add=True)
+    history = models.DateTimeField(auto_now_add=True, null=True)
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
 
 
