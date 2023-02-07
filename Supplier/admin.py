@@ -19,6 +19,19 @@ def is_string_an_url(url_string: str) -> bool:
 
     return result
 
+from django.core.paginator import Paginator
+
+class CustomPaginator(Paginator):
+    """
+    Paginator that does not count the rows in the table.
+    """
+    @property
+    def count(self):
+        try:
+            return self.object_list.count()
+        except (AttributeError, TypeError):
+            return len(self.object_list)
+
 # Register your models here.
 @admin.register(Supplier)
 class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
@@ -27,17 +40,19 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
             'all': ('css/fancy.css',)
         }
     form = SupplierForm
+    paginator = CustomPaginator
     indexCnt = 0
 
     def index_counter(self, obj):
-        print("index_counter num_pages")
-        # print(self.paginator.count)
-        # print(self.paginator.num_pages)
-        count = Supplier.objects.all().count()
-        if self.indexCnt < count:
+        min = (int(self.PAGE_INDEX) - 1) * self.list_per_page + 1
+        max = int(self.PAGE_INDEX) * self.list_per_page
+        print('index_counter', self.PAGE_INDEX, min, max)
+        if self.indexCnt < min:
+            self.indexCnt = min
+        if self.indexCnt < max:
             self.indexCnt += 1
         else:
-            self.indexCnt = 1
+            self.indexCnt = min
         return self.indexCnt
 
     index_counter.short_description = '#'
@@ -58,7 +73,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         }),
     )
 
-    list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
+    list_display = ['index_counter', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
     'location', 'year_display', 'gender', 'fields', 'original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc',
     'kpi', 'discount', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
     'group_chat_channel', 'lana_leader' , 'modified_by'
@@ -66,7 +81,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     list_display_links  = ['name',]
     list_filter = [CostRangeFilter, 'kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
     search_fields = ['name', 'link']
-    list_per_page = 200
+    #list_per_page = 25
     actions = ["export_as_xls"]
     ordering = ['id']
 
@@ -99,3 +114,21 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     def has_import_permission(self, request):
         has_perm = request.user.has_perm('Supplier.import_data_as_admin')
         return has_perm
+
+    # def get_queryset(self, request):
+    #     print('get_queryset')
+    #     print(request)
+    #     qs = super().get_queryset(request)
+    #     # if request.user.is_superuser:
+    #     #     return qs
+    #     return qs#qs.filter(author=request.user)
+
+    def get_search_results(self, request, queryset, search_term):
+        print('get_search_results')
+        queryset, duplicate = super().get_search_results(
+            request, queryset, search_term,
+        )
+        p = request.GET.get('p') or 1
+        self.PAGE_INDEX = p
+        
+        return queryset, duplicate
