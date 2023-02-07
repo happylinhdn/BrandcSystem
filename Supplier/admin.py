@@ -44,12 +44,14 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     indexCnt = 0
 
     def index_counter(self, obj):
-        min = (int(self.PAGE_INDEX) - 1) * self.list_per_page + 1
-        max = int(self.PAGE_INDEX) * self.list_per_page
-        print('index_counter', self.PAGE_INDEX, min, max)
+        page = self.PAGE_INDEX or 1
+        min = (int(page) - 1) * self.list_per_page + 1
+        max = int(page) * self.list_per_page
+        count = Supplier.objects.count()
+        print('index_counter', page, min, max, count)
         if self.indexCnt < min:
-            self.indexCnt = min
-        if self.indexCnt < max:
+            self.indexCnt = min - 1
+        if self.indexCnt < max and self.indexCnt < count:
             self.indexCnt += 1
         else:
             self.indexCnt = min
@@ -81,7 +83,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     list_display_links  = ['name',]
     list_filter = [CostRangeFilter, 'kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
     search_fields = ['name', 'link']
-    #list_per_page = 25
+    list_per_page = 25
     actions = ["export_as_xls"]
     ordering = ['id']
 
@@ -118,6 +120,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     # def get_queryset(self, request):
     #     print('get_queryset')
     #     print(request)
+    #     p = request.GET.get('p') or 1
     #     qs = super().get_queryset(request)
     #     # if request.user.is_superuser:
     #     #     return qs
