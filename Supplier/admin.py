@@ -8,7 +8,16 @@ from .resources import SupplierResource
 from django.utils.html import format_html
 from import_export.admin import ExportMixin, ExportActionMixin, ExportActionModelAdmin, ImportExportActionModelAdmin
 from import_export.admin import ImportExportMixin, ImportMixin
+import validators
+from validators import ValidationFailure
 
+def is_string_an_url(url_string: str) -> bool:
+    result = validators.url(url_string)
+
+    if isinstance(result, ValidationFailure):
+        return False
+
+    return result
 
 # Register your models here.
 @admin.register(Supplier)
@@ -66,7 +75,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         return """Name:{0} - Phone: {1} - Email:{2}""".format(obj.booking_contact_name or '-', obj.booking_contact_phone or '-', obj.booking_contact_email or '-')
     
     def profile_display(self, obj):
-        if obj.profile:
+        if obj.profile and is_string_an_url(obj.profile):
             return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=obj.profile, name='Link')
         return "-"
     profile_display.short_description = 'PROFILE/QUOTATION'
