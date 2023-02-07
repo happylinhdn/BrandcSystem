@@ -85,21 +85,21 @@ class Supplier(models.Model):
         return value
 
     def kol_tier_detect(self):
-        if self.follower_value() in range(1, 10000):
+        if self.follower_2 in range(1, 10000):
             return "Nano influencer"
-        elif self.follower_value() in range(10000, 50000):
+        elif self.follower_2 in range(10000, 50000):
             return "Micro influencer"
-        elif self.follower_value() in range(50000, 500000):
+        elif self.follower_2 in range(50000, 500000):
             return "Mid tier influencer"
-        elif self.follower_value() in range(500000, 1000000):
+        elif self.follower_2 in range(500000, 1000000):
             return "Macro influencer"
-        elif self.follower_value() >= 1000000:
+        elif self.follower_2 >= 1000000:
             return "Mega influencer"
         else:
             return "Unknown"
 
     def engagement_rate_absolute_calc(self):
-        follower_value = self.follower_value()
+        follower_value = self.follower_2
         rate = 0.0
         try:
             rate = self.engagement_rate_percent
