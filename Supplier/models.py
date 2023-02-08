@@ -5,6 +5,8 @@ from multiselectfield import MultiSelectField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
+from django.contrib import messages
+
 
 class Supplier(models.Model):
     #no = models.IntegerField() # todo: auto increase
@@ -14,7 +16,7 @@ class Supplier(models.Model):
     follower = models.CharField(max_length=20) # 17k -> 17000, 17M -> 17000000 
     follower_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
     kol_tier = models.CharField(max_length=20, editable=False, null=True)
-
+    
     engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
     engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
 
@@ -62,7 +64,8 @@ class Supplier(models.Model):
 
 
     def follower_value(self):
-        upperFollower = self.follower.upper().replace(",",".")
+        follower = str(self.follower) or '0'
+        upperFollower = follower.upper().replace(",",".")
         value = 0
         if 'K' in upperFollower:
             tempK = upperFollower.split("K")
@@ -70,6 +73,7 @@ class Supplier(models.Model):
                 value = float(tempK[0]) * 1000
             except:
                 print("Can not convert follower thousands")
+                raise Exception("The value of follower is not valid: " + str(self.follower  or ''))
 
         elif 'M' in upperFollower:
             tempK = upperFollower.split("M")
@@ -77,17 +81,18 @@ class Supplier(models.Model):
                 value = float(tempK[0]) * 1000000
             except:
                 print("Can not convert follower million")
+                raise Exception("The value of follower is not valid: " + str(self.follower  or ''))
         else:
             try:
                 value = float(upperFollower)
             except:
-                print("Can not convert follower upperFollower = ", upperFollower)
-                print("Can not convert follower self.follower = ", self.follower)
+                value = 0
+                raise Exception("The value of follower is not valid: " + str(self.follower  or ''))
         
         return value
 
     def kol_tier_detect(self):
-        if self.follower_2 in range(1, 10000):
+        if self.follower_2 in range(0, 10000):
             return "Nano influencer"
         elif self.follower_2 in range(10000, 50000):
             return "Micro influencer"
@@ -124,10 +129,60 @@ class Supplier(models.Model):
 
 
     def save(self, *args, **kwargs):
+        self.valid_form()
+        super(Supplier, self).save(*args, **kwargs)
+    
+    def valid_form(self):
         self.follower_2 = self.follower_value()
         self.kol_tier = self.kol_tier_detect()
         self.engagement_rate_absolute = self.engagement_rate_absolute_calc() 
-        super(Supplier, self).save(*args, **kwargs)
+        
+        if self.location:
+            self.location = self.location.strip()
+
+        if self.location == 'Vũng Tàu':
+            self.location = 'Bà Rịa-Vũng Tàu'
+        
+        if self.location is None:
+            raise Exception('Location can not empty')
+    
+        if self.location not in (key[0] for key in Location.choices):
+            raise Exception('Location is not valid: ' + str(self.location or ''))
+
+        if self.fields is None:
+            raise Exception('Fields can not empty')
+        
+        if self.fields and type(self.fields) == str:
+            valid = []
+            fields = (f.strip() for f in self.fields.split(",")) 
+            all_fields = Fields.choices
+
+            for field in fields:
+                if field and field not in (key[0] for key in all_fields):
+                    print('Field is not valid:' + str(field or ''))
+                    raise Exception('Field is not valid:' + str(field or ''))
+                else:
+                    valid.append(field)
+            self.fields = ','.join(valid)
+        
+        if self.channel is None:
+            raise Exception('Channel can not empty')
+
+        if self.channel:
+            self.channel = self.channel.strip()
+        
+        if self.channel and self.channel not in (key[0] for key in SupplierChannel.choices):
+            raise Exception('Channel is not valid: ' + str(self.channel or ''))
+
+        if self.gender is None:
+            raise Exception('Gender can not empty')
+
+        if self.gender:
+            self.gender = self.gender.strip()
+
+        if self.gender and self.gender not in (key[0] for key in Gender.choices):
+            raise Exception('Gender is not valid: ' + str(self.gender or ''))
+        
 
     def __str__(self):
         return self.name
