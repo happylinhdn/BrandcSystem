@@ -18,14 +18,14 @@ class Supplier(models.Model):
     engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
     engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
 
-    location = models.CharField(max_length=20, choices=Location.choices, default=Location.SG, null=True )
+    location = models.CharField(max_length=20, choices=Location.choices, null=True )
     year_of_birth = models.IntegerField(
-        default=1900,
+        null=True,
         validators=[
             MaxValueValidator(2030),
             MinValueValidator(1900)
         ])
-    gender = models.CharField(max_length=6, choices=Gender.choices, default=Gender.Male, null=True)
+    gender = models.CharField(max_length=6, choices=Gender.choices, null=True)
     
     fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
     #ORIGINAL COST
@@ -53,9 +53,9 @@ class Supplier(models.Model):
     #GROUP CHAT NAME
     group_chat_name = models.CharField(max_length=100, null=True)
     #Kênh (Zalo, Viber or Facebook) 
-    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, default=Kenh.Zalo, null=True)
+    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, null=True)
     #Set Leader Mode to Ms. Lana
-    lana_leader = models.BooleanField(default=True)
+    lana_leader = models.BooleanField(default = False, null=True)
     #History
     history = models.DateTimeField(auto_now_add=True, null=True)
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
@@ -81,7 +81,9 @@ class Supplier(models.Model):
             try:
                 value = float(upperFollower)
             except:
-                print("Can not convert follower")
+                print("Can not convert follower upperFollower = ", upperFollower)
+                print("Can not convert follower self.follower = ", self.follower)
+        
         return value
 
     def kol_tier_detect(self):
@@ -102,7 +104,7 @@ class Supplier(models.Model):
         follower_value = self.follower_2
         rate = 0.0
         try:
-            rate = self.engagement_rate_percent
+            rate = self.engagement_rate_percent or 0
         except:
             rate = 100
             print("Can not convert engagement_rate_percent")
