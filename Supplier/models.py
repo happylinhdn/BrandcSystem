@@ -170,8 +170,9 @@ class Supplier(models.Model):
     class Meta:
         permissions = [
             ("import_data_as_admin", "Can import data"),
-            ("export_excel_as_staff", "Can export excel with limit 100 records"),
-            ("export_excel_as_admin", "Can export excel with limit 1000 records")
+            ("export_excel_50_seller", "Can export excel as a seller role (50)"),
+            ("export_excel_100_buyer", "Can export excel as a buyer role (100)"),
+            ("export_excel_1000_admin", "Can export excel as an admin role")
         ]
 
 class ExcelFile(models.Model):

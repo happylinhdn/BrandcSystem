@@ -12,13 +12,19 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 
-# from django.contrib.auth.models import User, Permission
-# from django.contrib.contenttypes.models import ContentType
-# from .models import Supplier
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+from .models import Supplier
 
-# content_type = ContentType.objects.get_for_model(Supplier)
-# post_permission = Permission.objects.filter(content_type=content_type)
-# print([perm.codename for perm in post_permission])
+content_type = ContentType.objects.get_for_model(Supplier)
+post_permission = Permission.objects.filter(content_type=content_type)
+#print([perm.codename for perm in post_permission])
+for perm in post_permission:
+    print(perm, perm.codename)
+    if perm.codename in ('export_excel_50', 'export_excel_100', 'export_excel_1000', 'export_excel_as_admin', 'export_excel_as_staff'):
+        print ('do remove ', perm.codename)
+        perm.delete()
+
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
@@ -48,15 +54,17 @@ class ExportCsvMixin:
         Generic xls export admin action.
         """
         limit = -1
-        if request.user.has_perm("Supplier.export_excel_as_admin"):
-            limit = settings.EXPORT_RECORDS_ADMIN_LIMIT
-        elif request.user.has_perm("Supplier.export_excel_as_staff"):
-            limit = settings.EXPORT_RECORDS_LIMIT
+        if request.user.has_perm("Supplier.export_excel_1000_admin"):
+            limit = 1000#settings.EXPORT_RECORDS_ADMIN_LIMIT
+        elif request.user.has_perm("Supplier.export_excel_100_buyer"):
+            limit = 100
+        elif request.user.has_perm("Supplier.export_excel_50_seller"):
+            limit = 50
         else:
             messages.error(request, "This action is only for staff of brandc" )
             return HttpResponseRedirect(request.path_info)
 
-        if queryset.count()>limit:
+        if limit > 0 and queryset.count() > limit:
             messages.error(request, "Can't export more then %s Records in one go." % str(limit))
             return HttpResponseRedirect(request.path_info)
         
@@ -79,8 +87,8 @@ class ExportCsvMixin:
         for column in df:
             column_length = max(df[column].astype(str).map(len).max(), len(column))
             col_idx = df.columns.get_loc(column)
-            print('col_idx')
-            print(col_idx)
+            #print('col_idx')
+            #print(col_idx)
             worksheet.set_column(col_idx, col_idx, column_length)
 
         worksheet.set_column('J:J', 15)
@@ -107,5 +115,5 @@ class ExportCsvMixin:
         """Does the user have the publish permission?"""
         #opts = self.opts
         #codename = get_permission_codename('export', opts)
-        has_perm = request.user.has_perm('Supplier.export_excel_as_staff') | request.user.has_perm('Supplier.export_excel_as_admin')
+        has_perm = request.user.has_perm('Supplier.export_excel_50_seller') | request.user.has_perm('Supplier.export_excel_100_buyer') | request.user.has_perm('Supplier.export_excel_1000_admin')
         return has_perm
