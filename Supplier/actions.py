@@ -1,4 +1,5 @@
 import csv
+import imp
 from importlib.metadata import requires
 from django.http import HttpResponse
 
@@ -11,19 +12,20 @@ from io import BytesIO as IO
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
-
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
+from .utility import *
+
 from .models import Supplier
 
-content_type = ContentType.objects.get_for_model(Supplier)
-post_permission = Permission.objects.filter(content_type=content_type)
+# content_type = ContentType.objects.get_for_model(Supplier)
+# post_permission = Permission.objects.filter(content_type=content_type)
 #print([perm.codename for perm in post_permission])
-for perm in post_permission:
-    print(perm, perm.codename)
-    if perm.codename in ('export_excel_50', 'export_excel_100', 'export_excel_1000', 'export_excel_as_admin', 'export_excel_as_staff'):
-        print ('do remove ', perm.codename)
-        perm.delete()
+# for perm in post_permission:
+#     print(perm, perm.codename)
+#     if perm.codename in ('export_excel_50', 'export_excel_100', 'export_excel_1000', 'export_excel_as_admin', 'export_excel_as_staff'):
+#         print ('do remove ', perm.codename)
+#         perm.delete()
 
 
 class ExportCsvMixin:
@@ -48,7 +50,7 @@ class ExportCsvMixin:
 
     export_as_csv.short_description = "Export Selected"
 
-    @admin.action(permissions=['export'], description='Mark selected stories as published',)
+    @admin.action(permissions=['export'], description='Export selected rows to excel',)
     def export_as_xls(self, request, queryset):
         """
         Generic xls export admin action.
@@ -112,8 +114,44 @@ class ExportCsvMixin:
     export_as_xls.short_description = "Export selected to EXCEL"
 
     def has_export_permission(self, request):
-        """Does the user have the publish permission?"""
+        """Does the user have the export excel permission?"""
         #opts = self.opts
         #codename = get_permission_codename('export', opts)
         has_perm = request.user.has_perm('Supplier.export_excel_50_seller') | request.user.has_perm('Supplier.export_excel_100_buyer') | request.user.has_perm('Supplier.export_excel_1000_admin')
+        return has_perm
+    
+    @admin.action(permissions=['syncfollower'], description='Sync follower number',)
+    def sync_follower(self, request, queryset):
+        #result = read_followers('https://www.facebook.com/lebaobinh.fan', SupplierChannel.FB_PERSONAL) - success
+        #result = read_followers('https://www.facebook.com/hoquanghieutv', SupplierChannel.FB_PERSONAL)# - fail
+        #result = read_followers('https://www.facebook.com/IQFact', SupplierChannel.FB_FANPAGE) - success
+        #result = read_followers('https://www.facebook.com/fanpageNGLG/', SupplierChannel.FB_FANPAGE) - success
+        #result = read_followers('https://www.facebook.com/groups/groupyanpets/', SupplierChannel.FB_GROUP) - sucecss
+        #result = read_followers('https://www.facebook.com/groups/saigonconfession/', SupplierChannel.FB_GROUP) - success
+        #result = read_followers('https://www.tiktok.com/@tyle1994?lang=vi-VN', SupplierChannel.TIKTOK_PERSONAL) - success
+        #result = read_followers('https://www.tiktok.com/@quynhitraan?lang=vi-VN', SupplierChannel.TIKTOK_PERSONAL) - success
+        # result = read_followers('https://www.tiktok.com/@theanh28entertainment?lang=vi-VN', SupplierChannel.TIKTOK_COMMUNITY) - success
+        # result = read_followers('https://www.tiktok.com/@60giay.com', SupplierChannel.TIKTOK_COMMUNITY) - success
+        # result = read_followers('https://www.youtube.com/user/otosaigon', SupplierChannel.YOUTUBE_COMMUNITY) - success
+        #result = read_followers('https://www.youtube.com/c/ThanhCongTC', SupplierChannel.YOUTUBE_COMMUNITY)
+        for obj in queryset:
+            result = read_followers(obj.link, obj.channel)
+            if result > 0:
+                old_follower = obj.follower
+                obj.follower = convert_to_string_number(result)
+                try:
+                    obj.save()
+                    messages.info(request, obj.name + " was update follower number from " + old_follower + " to " +  str(obj.follower))
+                except Exception as e:
+                    messages.warning(request, obj.name + " can not update follower number, let try manual for this user, the error is " + str(e))
+                    pass
+            else:
+                messages.warning(request, obj.name + " can not update follower number, let try manual for this user")
+        
+        
+        return HttpResponseRedirect(request.path_info)
+
+    def has_syncfollower_permission(self, request):
+        """Does the user have the sync follower permission?"""
+        has_perm = request.user.has_perm('Supplier.sync_follower')
         return has_perm

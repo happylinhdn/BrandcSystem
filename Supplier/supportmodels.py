@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.translation import gettext as _
+from enum import Enum
 
 class Fields(models.TextChoices):
     Singer = 'Singer', _('Singer')
@@ -135,6 +136,26 @@ class SupplierChannel(models.TextChoices):
     WEBSITE = 'Website', _('Website')
     LINKED_IN = 'Linkedin', _('Linkedin')
     OTHERS = 'Others', _('Others')
+
+class XPATH(Enum):
+    FB_FANPAGE_1 = '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div[4]/div[2]/div/div[1]/div[2]/div[1]/div/div/div/div[2]/div[5]/div/div/div/div[2]/div/div/span/span'
+    FB_FANPAGE_2 = '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div/div/div/div[3]/div/div/div[2]/span/a[2]'
+    FB_GROUP = '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/div/div/div/div[1]/div/div/div/div/div/div[2]/span/span/div/div[3]/a'
+    #LeBaoBinh - OK
+    FB_PERSONAL_1 = '/html/body/div[1]/div[1]/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div/div/div/div[3]/div/div/div[2]/span/a[2]' 
+    TIKTOK_PERSONAL = '/html/body/div[2]/div[2]/div[2]/div/div[1]/h2[1]/div[2]/strong'
+    TIKTOK_COMMUNITY = '/html/body/div[2]/div[2]/div[2]/div/div[1]/h2[1]/div[2]/strong'
+    YOUTUBE_COMMUNITY = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-browse/div[3]/ytd-c4-tabbed-header-renderer/tp-yt-app-header-layout/div/tp-yt-app-header/div[2]/div[2]/div/div[1]/div/div[1]/yt-formatted-string[2]'
+    #Todo: let check HoQuangHieu - need login?
+    FB_PERSONAL_2 = '/html/body/div[1]/div[1]/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div/div/div/div[3]/div/div/div[2]/span/a[1]' 
+    #Not ready
+    YOUTUBE_PERSONAL = 'Youtube Personal'
+    INSTAGRAM = 'Instagram'
+    FORUM = 'Forum'
+    WEBSITE = 'Website'
+    LINKED_IN = 'Linkedin'
+    OTHERS = 'Others'
+
 
 class Gender(models.TextChoices):
     Male = 'Male', _('Male')
