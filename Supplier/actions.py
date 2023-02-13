@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import csv
 import imp
 from importlib.metadata import requires
@@ -144,7 +145,6 @@ class ExportCsvMixin:
                     messages.info(request, obj.name + " was update follower number from " + old_follower + " to " +  str(obj.follower))
                 except Exception as e:
                     messages.warning(request, obj.name + " can not update follower number, let try manual for this user, the error is " + str(e))
-                    pass
             else:
                 messages.warning(request, obj.name + " can not update follower number, let try manual for this user")
         

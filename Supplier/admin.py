@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.utils.translation import gettext as _
 from .models import Supplier
@@ -126,12 +127,12 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     #     #     return qs
     #     return qs#qs.filter(author=request.user)
 
-    def get_search_results(self, request, queryset, search_term):
-        print('get_search_results')
-        queryset, duplicate = super().get_search_results(
-            request, queryset, search_term,
-        )
-        p = request.GET.get('p') or 1
-        self.PAGE_INDEX = p
+    # def get_search_results(self, request, queryset, search_term):
+    #     print('get_search_results')
+    #     queryset, duplicate = super().get_search_results(
+    #         request, queryset, search_term,
+    #     )
+    #     p = request.GET.get('p') or 1
+    #     self.PAGE_INDEX = p
         
-        return queryset, duplicate
+    #     return queryset, duplicate
