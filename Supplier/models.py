@@ -226,8 +226,7 @@ class Supplier(models.Model):
             ("import_data_as_admin", "Can import data"),
             ("export_excel_50_seller", "Can export excel as a seller role (50)"),
             ("export_excel_100_buyer", "Can export excel as a buyer role (100)"),
-            ("export_excel_1000_admin", "Can export excel as an admin role"),
-            ("sync_follower", "Can sync follower number of kol")
+            ("export_excel_1000_admin", "Can export excel as an admin role")
         ]
 
 class ExcelFile(models.Model):

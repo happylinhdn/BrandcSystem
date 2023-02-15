@@ -85,7 +85,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     list_filter = [CostRangeFilter, 'kol_tier', 'gender', 'year_of_birth', 'channel', FieldsFilter, 'location', ]
     search_fields = ['name', 'link']
     list_per_page = 25
-    actions = ['export_as_xls', 'sync_follower']
+    actions = ['export_as_xls']
     ordering = ['id']
 
     

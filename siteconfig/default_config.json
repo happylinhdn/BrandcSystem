@@ -1,0 +1,30 @@
+[
+    {
+      "model": "siteconfig.SyncConfig",
+      "pk": 1,
+      "fields": {
+        "name": "Sync follower",
+        "mon": true,
+        "tue": true,
+        "wed": true,
+        "thu": true,
+        "fri": true,
+        "sat": true,
+        "sun": true
+      }
+    },
+    {
+      "model": "siteconfig.SyncConfig",
+      "pk": 2,
+      "fields": {
+        "name": "test config",
+        "mon": true,
+        "tue": true,
+        "wed": true,
+        "thu": true,
+        "fri": true,
+        "sat": true,
+        "sun": true
+      }
+    }
+  ]

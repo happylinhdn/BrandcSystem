@@ -13,3 +13,4 @@ django-import-export
 validators
 selenium 
 webdriver-manager 
+django-crontab==0.7.1
