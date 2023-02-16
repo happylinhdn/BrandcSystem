@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
 from django.contrib import messages
+from .utility import *
 
 
 class Supplier(models.Model):
@@ -63,34 +64,6 @@ class Supplier(models.Model):
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
 
 
-    def follower_value(self):
-        follower = str(self.follower) or '0'
-        upperFollower = follower.upper().replace(",",".")
-        value = 0
-        if 'K' in upperFollower:
-            tempK = upperFollower.split("K")
-            try:
-                value = float(tempK[0]) * 1000
-            except:
-                print("Can not convert follower thousands")
-                raise Exception("The value of follower is not valid: " + str(self.follower  or ''))
-
-        elif 'M' in upperFollower:
-            tempK = upperFollower.split("M")
-            try:
-                value = float(tempK[0]) * 1000000
-            except:
-                print("Can not convert follower million")
-                raise Exception("The value of follower is not valid: " + str(self.follower  or ''))
-        else:
-            try:
-                value = float(upperFollower)
-            except:
-                value = 0
-                raise Exception("The value of follower is not valid: " + str(self.follower  or ''))
-        
-        return value
-
     def kol_tier_detect(self):
         if self.follower_2 in range(0, 10000):
             return "Nano influencer"
@@ -133,7 +106,8 @@ class Supplier(models.Model):
         super(Supplier, self).save(*args, **kwargs)
     
     def valid_form(self):
-        self.follower_2 = self.follower_value()
+        self.follower_2 = convert_to_float(str(self.follower) or '0')
+        self.follower = convert_to_string_number(self.follower_2)
         self.kol_tier = self.kol_tier_detect()
         self.engagement_rate_absolute = self.engagement_rate_absolute_calc() 
         
