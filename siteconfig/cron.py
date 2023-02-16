@@ -40,9 +40,11 @@ def sync_follower():
                     logSuccess.save()
                 except Exception as e:
                     failText += (obj.name + '(Save fail from %s -> %s)\n' % (old_follower, obj.follower))
+                    logFail.log = failText
                     logFail.save()
             else:
                 failText += (obj.name + '(fetch fail, try update manual)\n')
+                logFail.log = failText
                 logFail.save()
     else:
         print('sync_follower Stop by config')
