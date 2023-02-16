@@ -5,8 +5,14 @@ import time
 def convert_to_float(follower_input):
     follower = follower_input or '-1'
     upperFollower = follower.upper()#.replace(",",".")
+    if upperFollower.count(',') >= 2:
+        upperFollower = upperFollower.replace(',','')
+    if upperFollower.count('.') >= 2:
+        upperFollower = upperFollower.replace('.','')
+        
     value = 0
     if 'K' in upperFollower:
+        upperFollower = upperFollower.replace(',', '.')
         tempK = upperFollower.split("K")
         try:
             value = float(tempK[0]) * 1000
@@ -15,6 +21,7 @@ def convert_to_float(follower_input):
             raise Exception("The value of follower is not valid: " + str(follower_input  or ''))
 
     elif 'M' in upperFollower:
+        upperFollower = upperFollower.replace(',', '.')
         tempK = upperFollower.split("M")
         try:
             value = float(tempK[0]) * 1000000
@@ -23,13 +30,7 @@ def convert_to_float(follower_input):
             raise Exception("The value of follower is not valid: " + str(follower_input  or ''))
     else:
         try:
-            if upperFollower.count(',') >= 2:
-                upperFollower = upperFollower.replace(',','')
-            if upperFollower.count('.') >= 2:
-                upperFollower = upperFollower.replace('.','')
-            
-            upperFollower = upperFollower.replace(",","")
-            print("upperFollower", upperFollower)
+            upperFollower = upperFollower.replace('.','') #todo: consider In VN 1.000 -> 1000
             value = float(upperFollower)
         except:
             value = 0
