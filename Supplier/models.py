@@ -65,15 +65,16 @@ class Supplier(models.Model):
 
 
     def kol_tier_detect(self):
-        if self.follower_2 in range(0, 10000):
+        number = int(self.follower_2)
+        if number in range(0, 10000):
             return "Nano influencer"
-        elif self.follower_2 in range(10000, 50000):
+        elif number in range(10000, 50000):
             return "Micro influencer"
-        elif self.follower_2 in range(50000, 500000):
+        elif number in range(50000, 500000):
             return "Mid tier influencer"
-        elif self.follower_2 in range(500000, 1000000):
+        elif number in range(500000, 1000000):
             return "Macro influencer"
-        elif self.follower_2 >= 1000000:
+        elif number >= 1000000:
             return "Mega influencer"
         else:
             return "Unknown"
@@ -106,8 +107,12 @@ class Supplier(models.Model):
         super(Supplier, self).save(*args, **kwargs)
     
     def valid_form(self):
+        print('valid_form start', self.follower)
         self.follower_2 = convert_to_float(str(self.follower) or '0')
+        
         self.follower = convert_to_string_number(self.follower_2)
+
+        print('valid_form', self.follower_2, self.follower)
         self.kol_tier = self.kol_tier_detect()
         self.engagement_rate_absolute = self.engagement_rate_absolute_calc() 
         

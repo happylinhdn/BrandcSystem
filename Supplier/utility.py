@@ -4,7 +4,7 @@ import time
 
 def convert_to_float(follower_input):
     follower = follower_input or '-1'
-    upperFollower = follower.upper().replace(",",".")
+    upperFollower = follower.upper()#.replace(",",".")
     value = 0
     if 'K' in upperFollower:
         tempK = upperFollower.split("K")
@@ -27,6 +27,9 @@ def convert_to_float(follower_input):
                 upperFollower = upperFollower.replace(',','')
             if upperFollower.count('.') >= 2:
                 upperFollower = upperFollower.replace('.','')
+            
+            upperFollower = upperFollower.replace(",","")
+            print("upperFollower", upperFollower)
             value = float(upperFollower)
         except:
             value = 0
