@@ -18,7 +18,7 @@ class Fields(models.TextChoices):
     Model = 'Model', _('Model')
     Showbiz = 'Showbiz', _('Showbiz')
     Make_up = 'Make-up', _('Make-up')
-    Cosmestic_Skincare = 'Cosmestic/Skincare', _('Cosmestic/Skincare')
+    Cosmestic_Skincare = 'Cosmetic/Skincare', _('Cosmetic/Skincare')
     Fashion = 'Fashion', _('Fashion')
     Travel = 'Travel', _('Travel')
     Lifestyle = 'Lifestyle', _('Lifestyle')
