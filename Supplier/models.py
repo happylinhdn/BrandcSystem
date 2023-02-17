@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
 from django.contrib import messages
-from .utility import *
+from Supplier.utility import *
 
 
 class Supplier(models.Model):

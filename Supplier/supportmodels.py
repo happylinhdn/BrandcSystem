@@ -147,7 +147,7 @@ class XPATH(Enum):
     TIKTOK_COMMUNITY = '/html/body/div[2]/div[2]/div[2]/div/div[1]/h3/div[2]/strong'
     YOUTUBE_COMMUNITY = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-browse/div[3]/ytd-c4-tabbed-header-renderer/tp-yt-app-header-layout/div/tp-yt-app-header/div[2]/div[2]/div/div[1]/div/div[1]/yt-formatted-string[2]'
     #Todo: let check HoQuangHieu - need login?
-    FB_PERSONAL_2 = '/html/body/div[1]/div[1]/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div/div/div/div[3]/div/div/div[2]/span/a[1]' 
+    FB_PERSONAL_2 = '//*[@id="mount_0_0_4z"]/div/div[1]/div/div[5]/div/div/div[3]/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div/div/div/div[3]/div/div/div[2]/span/a[1] ' 
     #Not ready
     YOUTUBE_PERSONAL = 'Youtube Personal'
     INSTAGRAM = 'Instagram'

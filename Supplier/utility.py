@@ -99,24 +99,23 @@ def read_followers(url, channel):
         if channel == SupplierChannel.FB_PERSONAL:
             # check need login
             try:
-                print('Login fb Start')
+                print('Try Login fb')
                 #driver.get('https://www.facebook.com/')
                 # actualTitle = driver.title
-                # email = driver.find_element(By.ID,'email')
-                # pwd = driver.find_element(By.ID,'pass')
-                # submit = driver.find_element(By.ID,'loginbutton')
-                # email.send_keys('brandcit2023@gmail.com')
-                # pwd.send_keys('Aesx5099')
+                email = driver.find_element(By.NAME,'email')
+                pwd = driver.find_element(By.NAME,'pass')
+                submit = driver.find_element(By.ID,'loginbutton')
+                email.send_keys('dev.dinosys@gmail.com')
+                pwd.send_keys('Aesx5099')
 
-                # submit.click()
-                # actualTitle = driver.title
-                # currentUrl = driver.current_url
-                # print('Login fb success -> ', actualTitle, currentUrl)
-
+                submit.click()
+                actualTitle = driver.title
+                currentUrl = driver.current_url
+                print('Login fb success -> ', actualTitle, currentUrl)
             except Exception as e:
-                print('Check login page fb: ', str(e))
+                print('SKip login page fb')
                 # html = driver.page_source
-                # time.sleep(2)
+                time.sleep(2)
                 # print('error current html', html)
                 pass
         
@@ -126,6 +125,17 @@ def read_followers(url, channel):
                 try:
                     if channel == SupplierChannel.TIKTOK_COMMUNITY or channel == SupplierChannel.TIKTOK_PERSONAL:
                         element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-e2e="followers-count"]')))
+                    elif channel == SupplierChannel.FB_PERSONAL or channel == SupplierChannel.FB_FANPAGE:
+                        tag = 'x1i10hfl'
+                        allLinks = driver.find_elements(By.CLASS_NAME, tag)
+                        for a in allLinks:
+                            try:
+                                link = a.get_attribute('href')
+                                if link and 'followers' in link:
+                                    element = a
+                                    break
+                            except:
+                                pass
                     else:
                         element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, xpath.value)))
                     
@@ -158,3 +168,23 @@ def read_followers(url, channel):
         
 
     return convert_to_float(followers)
+
+def read_element(element):
+    if element:
+        text = element.text
+        followers = text.replace('followers','')
+        followers = followers.replace('people follow this','')
+        followers = followers.replace('members','')
+        followers = followers.replace('subscribers','')
+        followers = followers.replace('người theo dõi','')
+        followers = followers.replace('triệu ','M')
+        followers = followers.replace('ngàn ','K')
+        followers = followers.replace('nghìn ','K')
+        
+        followers = followers.strip()
+        try:
+            temp = convert_to_float(followers)
+            return followers
+        except Exception as e:
+            return None
+    return None

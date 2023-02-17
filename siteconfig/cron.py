@@ -1,6 +1,6 @@
 from Supplier.models import Supplier
 from .models import BackgroundLog, SyncConfig
-from .utility import *
+from Supplier.utility import *
 import datetime
 
 def sync_follower():
@@ -43,7 +43,7 @@ def sync_follower():
                     logFail.log = failText
                     logFail.save()
             else:
-                failText += (obj.name + '(fetch fail, try update manual)\n')
+                failText += (obj.name + '(fetch fail)\n')
                 logFail.log = failText
                 logFail.save()
     else:
