@@ -119,6 +119,7 @@ def read_followers(url, channel):
                 # print('error current html', html)
                 pass
         
+        print('start for', channel)
         
         try:
             for xpath in xPathAddress:
@@ -126,6 +127,7 @@ def read_followers(url, channel):
                     if channel == SupplierChannel.TIKTOK_COMMUNITY or channel == SupplierChannel.TIKTOK_PERSONAL:
                         element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-e2e="followers-count"]')))
                     elif channel == SupplierChannel.FB_PERSONAL or channel == SupplierChannel.FB_FANPAGE:
+                        print('start for go', channel)
                         tag = 'x1i10hfl'
                         allLinks = driver.find_elements(By.CLASS_NAME, tag)
                         for a in allLinks:
