@@ -112,6 +112,7 @@ def read_followers(url, channel):
                 actualTitle = driver.title
                 currentUrl = driver.current_url
                 print('Login fb success -> ', actualTitle, currentUrl)
+                driver.get(url)
             except Exception as e:
                 print('SKip login page fb')
                 # html = driver.page_source
@@ -119,21 +120,23 @@ def read_followers(url, channel):
                 # print('error current html', html)
                 pass
         
-        print('start for', channel)
-        
         try:
             for xpath in xPathAddress:
                 try:
                     if channel == SupplierChannel.TIKTOK_COMMUNITY or channel == SupplierChannel.TIKTOK_PERSONAL:
                         element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-e2e="followers-count"]')))
                     elif channel == SupplierChannel.FB_PERSONAL or channel == SupplierChannel.FB_FANPAGE:
-                        print('start for go', channel)
+                        time.sleep(5)
                         tag = 'x1i10hfl'
                         allLinks = driver.find_elements(By.CLASS_NAME, tag)
+                        print('start for allLinks', channel)
                         for a in allLinks:
+                            print('a', a)
                             try:
                                 link = a.get_attribute('href')
+                                print('link', link)
                                 if link and 'followers' in link:
+                                    print('followers link', link)
                                     element = a
                                     break
                             except:

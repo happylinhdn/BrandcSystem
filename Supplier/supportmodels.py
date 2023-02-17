@@ -33,6 +33,7 @@ class Fields(models.TextChoices):
     Doctor = 'Doctor', _('Doctor')
     Architect = 'Architect', _('Architect')
     Smarthome = 'Smarthome', _('Smarthome')
+    Real_Estate = 'Real estate', _('Real estate')
     Home_Appliance = 'Home appliance', _('Home appliance')
     Interior_House = 'Interior house', _('Interior house')
     Decor_Design = 'Decor & Design', _('Decor & Design')
@@ -58,6 +59,7 @@ class Fields(models.TextChoices):
     Other = 'Other', _('Other')
 
 class Location(models.TextChoices):
+    General='General', _('General')
     AG='An Giang', _('An Giang')
     BV='Bà Rịa-Vũng Tàu', _('Bà Rịa-Vũng Tàu')
     BL='Bạc Liêu', _('Bạc Liêu')
