@@ -162,6 +162,7 @@ class XPATH(Enum):
 class Gender(models.TextChoices):
     Male = 'Male', _('Male')
     Female = 'Female', _('Female')
+    General='General', _('General')
 
 class Kenh(models.TextChoices):
     Zalo = 'Zalo', _('Zalo')

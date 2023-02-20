@@ -28,7 +28,7 @@ class Supplier(models.Model):
             MaxValueValidator(2030),
             MinValueValidator(1900)
         ])
-    gender = models.CharField(max_length=6, choices=Gender.choices, null=True)
+    gender = models.CharField(max_length=10, choices=Gender.choices, null=True)
     
     fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
     #ORIGINAL COST
