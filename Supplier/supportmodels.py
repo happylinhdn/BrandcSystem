@@ -59,7 +59,7 @@ class Fields(models.TextChoices):
     Other = 'Other', _('Other')
 
 class Location(models.TextChoices):
-    General='General', _('General')
+    All='Toàn Quốc', _('Toàn Quốc')
     AG='An Giang', _('An Giang')
     BV='Bà Rịa-Vũng Tàu', _('Bà Rịa-Vũng Tàu')
     BL='Bạc Liêu', _('Bạc Liêu')
