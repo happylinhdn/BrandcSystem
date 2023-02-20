@@ -192,7 +192,7 @@ class Supplier(models.Model):
             'BOOKING CONTACT PHONE': self.booking_contact_phone,
             'BOOKING CONTACT EMAIL': self.booking_contact_email,
             'PROFILE/QUOTATION': self.profile,
-            'LATEST UPDATE': self.latest_update.strftime('%Y-%m-%d %H:%M'),
+            'LATEST UPDATE': (self.latest_update and self.latest_update.strftime('%Y-%m-%d %H:%M')) or '',
             'HANDLE BY': self.handle_by,
             'GROUP CHAT NAME': self.group_chat_name,
             'GROUP CHAT CHANNEL': self.group_chat_channel,
