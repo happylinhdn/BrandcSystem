@@ -124,6 +124,7 @@ class Location(models.TextChoices):
     VL='Vĩnh Long', _('Vĩnh Long')
     VP='Vĩnh Phúc', _('Vĩnh Phúc')
     YB='Yên Bái', _('Yên Bái')
+    NN='Nước Ngoài', _('Nước Ngoài')
 
 class SupplierChannel(models.TextChoices):
     FB_GROUP = 'Facebook Group', _('Facebook Group')
