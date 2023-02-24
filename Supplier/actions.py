@@ -135,6 +135,11 @@ class ExportCsvMixin:
         # result = read_followers('https://www.tiktok.com/@60giay.com', SupplierChannel.TIKTOK_COMMUNITY) - success
         # result = read_followers('https://www.youtube.com/user/otosaigon', SupplierChannel.YOUTUBE_COMMUNITY) - success
         #result = read_followers('https://www.youtube.com/c/ThanhCongTC', SupplierChannel.YOUTUBE_COMMUNITY)
+        limit = 4
+        if limit > 0 and queryset.count() > limit:
+            messages.error(request, "Can't sync more than %s Records in one go." % str(limit))
+            return HttpResponseRedirect(request.path_info)
+            
         for obj in queryset:
             result = read_followers(obj.link, obj.channel)
             if result > 0:
@@ -144,9 +149,9 @@ class ExportCsvMixin:
                     obj.save()
                     messages.info(request, obj.name + " was update follower number from " + old_follower + " to " +  str(obj.follower))
                 except Exception as e:
-                    messages.warning(request, obj.name + " can not update follower number, let try manual for this user, the error is " + str(e))
+                    messages.warning(request, obj.name + " can not update follower number, let try manual for this record, the error is " + str(e))
             else:
-                messages.warning(request, obj.name + " can not update follower number, let try manual for this user")
+                messages.warning(request, obj.name + " can not update follower number, let try manual for this record")
         
         
         return HttpResponseRedirect(request.path_info)
