@@ -107,12 +107,9 @@ class Supplier(models.Model):
         super(Supplier, self).save(*args, **kwargs)
     
     def valid_form(self):
-        print('valid_form start', self.follower)
         self.follower_2 = convert_to_float(str(self.follower) or '0')
         
         self.follower = convert_to_string_number(self.follower_2)
-
-        print('valid_form', self.follower_2, self.follower)
         self.kol_tier = self.kol_tier_detect()
         self.engagement_rate_absolute = self.engagement_rate_absolute_calc() 
         

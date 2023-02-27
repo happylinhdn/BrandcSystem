@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 from .models import Supplier
-from .list_filters import FieldsFilter, CostRangeFilter
+from .list_filters import FieldsFilter, CostRangeFilter, YearRangeFilter
 from .forms import SupplierForm
 from .actions import ExportCsvMixin
 from .resources import SupplierResource
@@ -82,7 +82,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     'group_chat_channel', 'lana_leader' , 'modified_by'
     ]
     list_display_links  = ['name',]
-    list_filter = [CostRangeFilter, 'kol_tier', 'handle_by', 'gender', 'channel', FieldsFilter, 'location', 'year_of_birth']
+    list_filter = [CostRangeFilter, 'kol_tier', 'handle_by', 'gender', 'channel', FieldsFilter, YearRangeFilter, 'location']
     search_fields = ['name', 'link']
     list_per_page = 25
     actions = ['export_as_xls', 'sync_follower']

@@ -38,14 +38,24 @@ def sync_follower():
                     successText += (obj.name + '(Updated from %s -> %s)\n' % (old_follower, obj.follower))
                     logSuccess.log = successText
                     logSuccess.save()
+                    if len(successText) > 1000:
+                        successText = ''
+                        logSuccess = BackgroundLog(log = successText)
+
                 except Exception as e:
                     failText += (obj.name + '(Save fail from %s -> %s)\n' % (old_follower, obj.follower))
                     logFail.log = failText
                     logFail.save()
+                    if len(failText) > 1000:
+                        failText = ''
+                        logFail = BackgroundLog(log = failText, isSuccess = False)
             else:
                 failText += (obj.name + '(fetch fail)\n')
                 logFail.log = failText
                 logFail.save()
+                if len(failText) > 1000:
+                    failText = ''
+                    logFail = BackgroundLog(log = failText, isSuccess = False)
     else:
         print('sync_follower Stop by config')
 
