@@ -4,7 +4,7 @@ from Supplier.utility import *
 import datetime
 
 def sync_follower():
-    print('sync_follower Start')
+    log = 'sync_follower Start'
     should_sync = True
     
     x_date = datetime.date.today()
@@ -22,7 +22,7 @@ def sync_follower():
             break
     
     if should_sync:
-        print('sync_follower Start by config')
+        log += '\n sync_follower Start by config'
         successText = ''
         failText = ''
         logSuccess = BackgroundLog(log = successText)
@@ -32,33 +32,43 @@ def sync_follower():
             result = read_followers(obj.link, obj.channel)
             if result > 0:
                 old_follower = obj.follower
-                obj.follower = convert_to_string_number(result)
-                try:
-                    obj.save()
-                    successText += (obj.name + '(Updated from %s -> %s)\n' % (old_follower, obj.follower))
+                new_follwer = convert_to_string_number(result)
+                obj.follower = new_follwer
+                if old_follower != new_follwer:
+                    try:
+                        obj.save()
+                        successText += (obj.name + '-' + str(obj.id) + '(%s -> %s)\n' % (old_follower, obj.follower))
+                        logSuccess.log = successText
+                        logSuccess.save()
+                        if len(successText) > 1000:
+                            successText = ''
+                            logSuccess = BackgroundLog(log = successText)
+
+                    except Exception as e:
+                        failText += (obj.name + '-' + str(obj.id) + '(Save fail from %s -> %s)\n' % (old_follower, obj.follower))
+                        logFail.log = failText
+                        logFail.save()
+                        if len(failText) > 1000:
+                            failText = ''
+                            logFail = BackgroundLog(log = failText, isSuccess = False)
+                else:
+                    successText += (obj.name + '-' + str(obj.id) + '(Same)\n')
                     logSuccess.log = successText
                     logSuccess.save()
-                    if len(successText) > 1000:
-                        successText = ''
-                        logSuccess = BackgroundLog(log = successText)
 
-                except Exception as e:
-                    failText += (obj.name + '(Save fail from %s -> %s)\n' % (old_follower, obj.follower))
-                    logFail.log = failText
-                    logFail.save()
-                    if len(failText) > 1000:
-                        failText = ''
-                        logFail = BackgroundLog(log = failText, isSuccess = False)
             else:
-                failText += (obj.name + '(fetch fail)\n')
+                failText += (obj.name + '-' + str(obj.id) + '\n')
                 logFail.log = failText
                 logFail.save()
                 if len(failText) > 1000:
                     failText = ''
                     logFail = BackgroundLog(log = failText, isSuccess = False)
     else:
-        print('sync_follower Stop by config')
+        log += '\n sync_follower Stop by config'
 
-    print('sync_follower End')
+    log += '\n sync_follower End'
+    logObj = BackgroundLog(log = log)
+    logObj.log = log
+    logObj.save()
 
     
