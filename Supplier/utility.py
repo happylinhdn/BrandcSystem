@@ -1,6 +1,25 @@
 # -*- coding: utf-8 -*-
 from .supportmodels import SupplierChannel, XPATH
 import time
+import re
+from urllib.parse import quote
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import json
+
+def detectNumber(input):
+    detec_input = (input or '').replace('  ', '')
+    nums2 = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d)?[\s]?[kK]?[mM]?")
+    match = nums2.search(detec_input)
+    if match:
+        output = match.group(0)
+        return output
+    return None
 
 def convert_to_float(follower_input):
     follower = follower_input or '-1'
@@ -35,7 +54,7 @@ def convert_to_float(follower_input):
         except:
             value = 0
             raise Exception("The value of follower is not valid: " + str(follower_input or ''))
-    
+    print('convert_to_float input = ', follower_input, ' - ', value)
     return value
 
 def convert_to_string_number(number):
@@ -49,15 +68,71 @@ def convert_to_string_number(number):
     return "{0}".format(round(number, 2))
 
 ##### MAIN FUNC    
-def read_followers(url, channel):
-    from urllib.parse import quote
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.chrome.service import Service
-    from webdriver_manager.chrome import ChromeDriverManager
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.wait import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
+def support_sync(channel):
+    if channel == SupplierChannel.FB_GROUP:
+        return True
+    if channel == SupplierChannel.FB_FANPAGE:
+        return True
+    if channel == SupplierChannel.FB_PERSONAL:
+        return True
+    if channel == SupplierChannel.TIKTOK_COMMUNITY:
+        return True
+    if channel == SupplierChannel.TIKTOK_PERSONAL:
+        return True
+    if channel == SupplierChannel.TIKTOK_PERSONAL:
+        return True
+    if channel == SupplierChannel.YOUTUBE_COMMUNITY:
+        return True
+    if channel == SupplierChannel.YOUTUBE_PERSONAL:
+        return True
+
+    return False
+
+def prepare_driver():
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    return driver
+
+def close_driver(driver):
+    driver.close()
+    driver.quit()
+
+def login_facebook(driver):
+    try:
+        print('Try Login fb')
+        driver.get('https://www.facebook.com/')
+        # Opening JSON file
+        f = open('fb.json')
+        # returns JSON object as 
+        # a dictionary
+        data = json.load(f)
+        print(data['s1'])
+
+        # Closing file
+        f.close()
+
+        # actualTitle = driver.title
+        email = driver.find_element(By.NAME,'email')
+        pwd = driver.find_element(By.NAME,'pass')
+        submit = driver.find_element(By.ID,'loginbutton')
+        email.send_keys(data['s1'])
+        pwd.send_keys(data['s2'])
+
+        submit.click()
+        actualTitle = driver.title
+        currentUrl = driver.current_url
+        print('Login fb success -> ', actualTitle, currentUrl)
+    except Exception as e:
+        print('SKip login page fb')
+        time.sleep(2)
+    return driver
+
+def read_followers(driver, url, channel, should_close = True):
+    if support_sync(channel) == False:
+        return None
 
     xPathAddress = []
     if channel == SupplierChannel.FB_GROUP:
@@ -89,37 +164,13 @@ def read_followers(url, channel):
     
     followers= None
     if len(xPathAddress) > 0:
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         driver.get(url)
         
         if channel == SupplierChannel.FB_PERSONAL:
             # check need login
-            try:
-                print('Try Login fb')
-                #driver.get('https://www.facebook.com/')
-                # actualTitle = driver.title
-                email = driver.find_element(By.NAME,'email')
-                pwd = driver.find_element(By.NAME,'pass')
-                submit = driver.find_element(By.ID,'loginbutton')
-                email.send_keys('dev.dinosys@gmail.com')
-                pwd.send_keys('Aesx5099')
+            driver = login_facebook(driver)
 
-                submit.click()
-                actualTitle = driver.title
-                currentUrl = driver.current_url
-                print('Login fb success -> ', actualTitle, currentUrl)
-                driver.get(url)
-            except Exception as e:
-                print('SKip login page fb')
-                # html = driver.page_source
-                time.sleep(2)
-                # print('error current html', html)
-                pass
-        
+        driver.get(url)
         try:
             for xpath in xPathAddress:
                 try:
@@ -129,67 +180,49 @@ def read_followers(url, channel):
                         time.sleep(5)
                         tag = 'x1i10hfl'
                         allLinks = driver.find_elements(By.CLASS_NAME, tag)
-                        print('start for allLinks', channel)
                         for a in allLinks:
-                            print('a', a)
                             try:
                                 link = a.get_attribute('href')
                                 print('link', link)
                                 if link and 'followers' in link:
-                                    print('followers link', link)
                                     element = a
                                     break
                             except:
                                 pass
                     else:
                         element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, xpath.value)))
-                    
-                    if element:
-                        text = element.text
-                        print('read success for ', xpath, text, url)
-                        followers = text.replace('followers','')
-                        followers = followers.replace('people follow this','')
-                        followers = followers.replace('members','')
-                        followers = followers.replace('subscribers','')
-                        followers = followers.replace('người theo dõi','')
-                        followers = followers.replace('triệu ','M')
-                        followers = followers.replace('ngàn ','K')
-                        followers = followers.replace('nghìn ','K')
-                        
-                        followers = followers.strip()
-                        try:
-                            temp = convert_to_float(followers)
-                            print('read success for followers = ', followers)
-                            break
-                        except Exception as e:
-                            print('pass data success for ', channel, url, xpath)
+                    followers = read_element(element)
                 except Exception as e:
                     print('read not success for ', channel, url, xpath)
         except:
             print('read not success for ', channel, url)
         finally:
-            driver.close()
-            driver.quit()
+            if should_close:
+                driver.close()
+                driver.quit()
         
 
     return convert_to_float(followers)
 
 def read_element(element):
     if element:
-        text = element.text
-        followers = text.replace('followers','')
-        followers = followers.replace('people follow this','')
-        followers = followers.replace('members','')
-        followers = followers.replace('subscribers','')
-        followers = followers.replace('người theo dõi','')
-        followers = followers.replace('triệu ','M')
-        followers = followers.replace('ngàn ','K')
-        followers = followers.replace('nghìn ','K')
-        
-        followers = followers.strip()
         try:
+            text = element.text
+            followers = text.replace('followers','')
+            
+            followers = followers.replace('people follow this','')
+            followers = followers.replace('members','')
+            followers = followers.replace('subscribers','')
+            followers = followers.replace('người theo dõi','')
+            followers = followers.replace('triệu ','M')
+            followers = followers.replace('ngàn ','K')
+            followers = followers.replace('nghìn ','K')
+            
+            followers = followers.strip()
+            print('read_element followers = ', followers)
             temp = convert_to_float(followers)
             return followers
         except Exception as e:
+            print('read_element not success for ', text)
             return None
     return None

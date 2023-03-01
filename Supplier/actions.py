@@ -139,9 +139,9 @@ class ExportCsvMixin:
         if limit > 0 and queryset.count() > limit:
             messages.error(request, "Can't sync more than %s Records in one go." % str(limit))
             return HttpResponseRedirect(request.path_info)
-            
+        driver = prepare_driver()
         for obj in queryset:
-            result = read_followers(obj.link, obj.channel)
+            result = read_followers(driver, obj.link, obj.channel)
             if result > 0:
                 old_follower = obj.follower
                 obj.follower = convert_to_string_number(result)

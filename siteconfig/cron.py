@@ -4,7 +4,10 @@ from Supplier.utility import *
 import datetime
 
 def sync_follower():
-    log = 'sync_follower Start'
+    log = 'sync_follower Start,'
+    logObj = BackgroundLog(log = log)
+    logObj.log = log
+    logObj.save()
     should_sync = True
     
     x_date = datetime.date.today()
@@ -22,53 +25,61 @@ def sync_follower():
             break
     
     if should_sync:
-        log += '\n sync_follower Start by config'
+        log += '\n sync_follower Start by config,'
+        logObj.log = log
+        logObj.save()
         successText = ''
         failText = ''
         logSuccess = BackgroundLog(log = successText)
         logFail = BackgroundLog(log = failText, isSuccess = False)
+        driver = None
 
         for obj in Supplier.objects.all():
-            result = read_followers(obj.link, obj.channel)
-            if result > 0:
-                old_follower = obj.follower
-                new_follwer = convert_to_string_number(result)
-                obj.follower = new_follwer
-                if old_follower != new_follwer:
-                    try:
-                        obj.save()
-                        successText += (obj.name + '-' + str(obj.id) + '(%s -> %s)\n' % (old_follower, obj.follower))
+            if support_sync(obj.channel):
+                driver = prepare_driver()
+                result = read_followers(driver, obj.link, obj.channel, False)
+                if result > 0:
+                    old_follower = obj.follower
+                    new_follwer = convert_to_string_number(result)
+                    obj.follower = new_follwer
+                    if old_follower != new_follwer:
+                        try:
+                            obj.save()
+                            successText += (obj.name + '(%s -> %s),\n' % (old_follower, obj.follower))
+                            logSuccess.log = successText
+                            logSuccess.save()
+                            if len(successText) > 1000:
+                                successText = ''
+                                logSuccess = BackgroundLog(log = successText)
+
+                        except Exception as e:
+                            failText += (obj.name + '(Save fail %s -> %s),\n' % (old_follower, obj.follower))
+                            logFail.log = failText
+                            logFail.save()
+                            if len(failText) > 1000:
+                                failText = ''
+                                logFail = BackgroundLog(log = failText, isSuccess = False)
+                    else:
+                        successText += (obj.name + '(-),\n')
                         logSuccess.log = successText
                         logSuccess.save()
-                        if len(successText) > 1000:
-                            successText = ''
-                            logSuccess = BackgroundLog(log = successText)
 
-                    except Exception as e:
-                        failText += (obj.name + '-' + str(obj.id) + '(Save fail from %s -> %s)\n' % (old_follower, obj.follower))
-                        logFail.log = failText
-                        logFail.save()
-                        if len(failText) > 1000:
-                            failText = ''
-                            logFail = BackgroundLog(log = failText, isSuccess = False)
                 else:
-                    successText += (obj.name + '-' + str(obj.id) + '(Same)\n')
-                    logSuccess.log = successText
-                    logSuccess.save()
-
-            else:
-                failText += (obj.name + '-' + str(obj.id) + '\n')
-                logFail.log = failText
-                logFail.save()
-                if len(failText) > 1000:
-                    failText = ''
-                    logFail = BackgroundLog(log = failText, isSuccess = False)
+                    failText += (obj.name + ',\n')
+                    logFail.log = failText
+                    logFail.save()
+                    if len(failText) > 1000:
+                        failText = ''
+                        logFail = BackgroundLog(log = failText, isSuccess = False)
     else:
-        log += '\n sync_follower Stop by config'
+        log += '\n sync_follower Stop by config, '
+        logObj.log = log
+        logObj.save()
 
+    if driver:
+        close_driver(driver)
+        driver = None
+    
     log += '\n sync_follower End'
-    logObj = BackgroundLog(log = log)
     logObj.log = log
     logObj.save()
-
-    
