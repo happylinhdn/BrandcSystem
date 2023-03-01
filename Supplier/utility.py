@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from .supportmodels import SupplierChannel, XPATH
 import time
-import re
+import re, os
 from urllib.parse import quote
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
+from django.conf import settings
 
 def detectNumber(input):
     detec_input = (input or '').replace('  ', '')
@@ -101,27 +102,26 @@ def close_driver(driver):
     driver.quit()
 
 def login_facebook(driver):
+    print('Try Login fb')
+    #driver.get('https://www.facebook.com/')
+    # Opening JSON file
+    
     try:
-        print('Try Login fb')
-        driver.get('https://www.facebook.com/')
-        # Opening JSON file
-        f = open('fb.json')
-        # returns JSON object as 
-        # a dictionary
-        data = json.load(f)
-        print(data['s1'])
-
-        # Closing file
-        f.close()
-
         # actualTitle = driver.title
-        email = driver.find_element(By.NAME,'email')
-        pwd = driver.find_element(By.NAME,'pass')
-        submit = driver.find_element(By.ID,'loginbutton')
-        email.send_keys(data['s1'])
-        pwd.send_keys(data['s2'])
+        emailView = driver.find_element(By.NAME,'email')
+        pwdView = driver.find_element(By.NAME,'pass')
+        submitView = driver.find_element(By.ID,'loginbutton')
+        email = ''
+        pwd = ''
+        with open(os.path.join(settings.BASE_DIR, 'secrets.json')) as secrets_file:
+            data = json.load(secrets_file)
+            email = data['s1']
+            pwd = data['s2']
+        print(email)
 
-        submit.click()
+        emailView.send_keys(email)
+        pwdView.send_keys(pwd)
+        submitView.click()
         actualTitle = driver.title
         currentUrl = driver.current_url
         print('Login fb success -> ', actualTitle, currentUrl)
@@ -131,43 +131,20 @@ def login_facebook(driver):
     return driver
 
 def read_followers(driver, url, channel, should_close = True):
+    if driver == None:
+        return -1
+    
     if support_sync(channel) == False:
         return None
 
-    xPathAddress = []
-    if channel == SupplierChannel.FB_GROUP:
-        xPathAddress.append(XPATH.FB_GROUP)
-    elif channel == SupplierChannel.FB_FANPAGE:
-        xPathAddress.append(XPATH.FB_FANPAGE_1)
-        xPathAddress.append(XPATH.FB_FANPAGE_2)
-    elif channel == SupplierChannel.FB_PERSONAL:
-        xPathAddress.append(XPATH.FB_PERSONAL_1)
-        xPathAddress.append(XPATH.FB_PERSONAL_2)
-    elif channel == SupplierChannel.TIKTOK_COMMUNITY:
-        xPathAddress.append(XPATH.TIKTOK_COMMUNITY)
-    elif channel == SupplierChannel.TIKTOK_PERSONAL:
-        xPathAddress.append(XPATH.TIKTOK_PERSONAL)
-    elif channel == SupplierChannel.YOUTUBE_COMMUNITY:
-        xPathAddress.append(XPATH.YOUTUBE_COMMUNITY)
-    elif channel == SupplierChannel.YOUTUBE_PERSONAL:
-        xPathAddress.append(XPATH.YOUTUBE_PERSONAL)
-    elif channel == SupplierChannel.INSTAGRAM:
-        xPathAddress.append(XPATH.INSTAGRAM)
-    elif channel == SupplierChannel.FORUM:
-        xPathAddress.append(XPATH.FORUM)
-    elif channel == SupplierChannel.WEBSITE:
-        xPathAddress.append(XPATH.WEBSITE)
-    elif channel == SupplierChannel.LINKED_IN:
-        xPathAddress.append(XPATH.LINKED_IN)
-    else:
-        pass
+    xPathAddress = prepareXpath(channel)
     
     followers= None
     if len(xPathAddress) > 0:
-        driver.get(url)
-        
         if channel == SupplierChannel.FB_PERSONAL:
             # check need login
+            driver.get(url)
+            #time.sleep(5)
             driver = login_facebook(driver)
 
         driver.get(url)
@@ -177,14 +154,14 @@ def read_followers(driver, url, channel, should_close = True):
                     if channel == SupplierChannel.TIKTOK_COMMUNITY or channel == SupplierChannel.TIKTOK_PERSONAL:
                         element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-e2e="followers-count"]')))
                     elif channel == SupplierChannel.FB_PERSONAL or channel == SupplierChannel.FB_FANPAGE:
-                        time.sleep(5)
+                        time.sleep(3)
                         tag = 'x1i10hfl'
                         allLinks = driver.find_elements(By.CLASS_NAME, tag)
                         for a in allLinks:
                             try:
                                 link = a.get_attribute('href')
-                                print('link', link)
                                 if link and 'followers' in link:
+                                    print('link', link)
                                     element = a
                                     break
                             except:
@@ -226,3 +203,33 @@ def read_element(element):
             print('read_element not success for ', text)
             return None
     return None
+
+def prepareXpath(channel):
+    xPathAddress = []
+    if channel == SupplierChannel.FB_GROUP:
+        xPathAddress.append(XPATH.FB_GROUP)
+    elif channel == SupplierChannel.FB_FANPAGE:
+        xPathAddress.append(XPATH.FB_FANPAGE_1)
+        xPathAddress.append(XPATH.FB_FANPAGE_2)
+    elif channel == SupplierChannel.FB_PERSONAL:
+        xPathAddress.append(XPATH.FB_PERSONAL_1)
+        xPathAddress.append(XPATH.FB_PERSONAL_2)
+    elif channel == SupplierChannel.TIKTOK_COMMUNITY:
+        xPathAddress.append(XPATH.TIKTOK_COMMUNITY)
+    elif channel == SupplierChannel.TIKTOK_PERSONAL:
+        xPathAddress.append(XPATH.TIKTOK_PERSONAL)
+    elif channel == SupplierChannel.YOUTUBE_COMMUNITY:
+        xPathAddress.append(XPATH.YOUTUBE_COMMUNITY)
+    elif channel == SupplierChannel.YOUTUBE_PERSONAL:
+        xPathAddress.append(XPATH.YOUTUBE_PERSONAL)
+    elif channel == SupplierChannel.INSTAGRAM:
+        xPathAddress.append(XPATH.INSTAGRAM)
+    elif channel == SupplierChannel.FORUM:
+        xPathAddress.append(XPATH.FORUM)
+    elif channel == SupplierChannel.WEBSITE:
+        xPathAddress.append(XPATH.WEBSITE)
+    elif channel == SupplierChannel.LINKED_IN:
+        xPathAddress.append(XPATH.LINKED_IN)
+    else:
+        pass
+    return xPathAddress

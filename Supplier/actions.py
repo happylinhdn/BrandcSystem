@@ -141,7 +141,7 @@ class ExportCsvMixin:
             return HttpResponseRedirect(request.path_info)
         driver = prepare_driver()
         for obj in queryset:
-            result = read_followers(driver, obj.link, obj.channel)
+            result = read_followers(driver, obj.link, obj.channel, False)
             if result > 0:
                 old_follower = obj.follower
                 obj.follower = convert_to_string_number(result)
@@ -152,7 +152,9 @@ class ExportCsvMixin:
                     messages.warning(request, obj.name + " can not update follower number, let try manual for this record, the error is " + str(e))
             else:
                 messages.warning(request, obj.name + " can not update follower number, let try manual for this record")
-        
+        if driver:
+            close_driver(driver)
+            driver = None
         
         return HttpResponseRedirect(request.path_info)
 
