@@ -53,8 +53,12 @@ def convert_to_float(follower_input):
             upperFollower = upperFollower.replace('.','') #todo: consider In VN 1.000 -> 1000
             value = float(upperFollower)
         except:
-            value = 0
-            raise Exception("The value of follower is not valid: " + str(follower_input or ''))
+            try:
+                upperFollower = detectNumber(upperFollower)
+                value = float(upperFollower)
+            except:
+                value = 0
+                raise Exception("The value of follower is not valid: " + str(follower_input or ''))
     print('convert_to_float input = ', follower_input, ' - ', value)
     return value
 
@@ -191,6 +195,9 @@ def read_element(element):
             followers = followers.replace('members','')
             followers = followers.replace('subscribers','')
             followers = followers.replace('người theo dõi','')
+            followers = followers.replace('people','')
+            followers = followers.replace('người','')
+            followers = followers.replace('theo dõi','')
             followers = followers.replace('triệu ','M')
             followers = followers.replace('ngàn ','K')
             followers = followers.replace('nghìn ','K')
