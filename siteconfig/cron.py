@@ -4,7 +4,7 @@ from Supplier.utility import *
 import datetime
 
 def sync_follower():
-    log = 'sync_follower Start,'
+    log = 'Thread Start,'
     logObj = BackgroundLog(log = log)
     logObj.log = log
     logObj.save()
@@ -23,20 +23,20 @@ def sync_follower():
                           (no == 5 and config.sat) or \
                           (no == 6 and config.sun)
             break
-    
+    driver = None
+
     if should_sync:
-        log += '\n sync_follower Start by config,'
+        log += '\n Start Sync config,'
         logObj.log = log
         logObj.save()
         successText = ''
         failText = ''
         logSuccess = BackgroundLog(log = successText)
         logFail = BackgroundLog(log = failText, isSuccess = False)
-        driver = None
-
+        
+        driver = prepare_driver()
         for obj in Supplier.objects.all():
             if support_sync(obj.channel):
-                driver = prepare_driver()
                 result = read_followers(driver, obj.link, obj.channel, False)
                 if result > 0:
                     old_follower = obj.follower
@@ -65,21 +65,24 @@ def sync_follower():
                         logSuccess.save()
 
                 else:
-                    failText += (obj.name + ',\n')
+                    failText += (obj.name + '(%s),\n' % (obj.channel) )
                     logFail.log = failText
                     logFail.save()
                     if len(failText) > 1000:
                         failText = ''
                         logFail = BackgroundLog(log = failText, isSuccess = False)
+        
+        if driver:
+            log += '\n Close Driver, '
+            logObj.log = log
+            logObj.save()
+            close_driver(driver)
+            driver = None
     else:
-        log += '\n sync_follower Stop by config, '
+        log += '\n Stop by config, '
         logObj.log = log
         logObj.save()
-
-    if driver:
-        close_driver(driver)
-        driver = None
     
-    log += '\n sync_follower End'
+    log += '\n Thread End'
     logObj.log = log
     logObj.save()
