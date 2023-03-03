@@ -7,6 +7,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
 from django.contrib import messages
 from Supplier.utility import *
+from Supplier.utility_numbers import *
 
 
 class Supplier(models.Model):
@@ -36,16 +37,16 @@ class Supplier(models.Model):
     original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True)
     original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True)
     original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True)
-    kpi = models.CharField(verbose_name='KPI', max_length=50, null=True)
+    kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
 
     #DISCOUNT, SUPPLIER NAME
-    discount = models.CharField(max_length=50, null=True)
-    supplier_name = models.CharField(max_length=100, null=True)
+    discount = models.CharField(max_length=150, null=True)
+    supplier_name = models.CharField(max_length=200, null=True)
 
     #BOOKING CONTACT: Name, Phone, Email
-    booking_contact_name = models.CharField(max_length=100, null=True)
-    booking_contact_phone = models.CharField(max_length=15, null=True)
-    booking_contact_email = models.CharField(max_length=50, null=True)
+    booking_contact_name = models.CharField(max_length=200, null=True)
+    booking_contact_phone = models.CharField(max_length=200, null=True)
+    booking_contact_email = models.CharField(max_length=200, null=True)
 
     #profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
     profile = models.CharField(verbose_name='Profile/Quotation', max_length=300, null=True)

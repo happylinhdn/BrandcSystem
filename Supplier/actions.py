@@ -18,16 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from .utility import *
 
 from .models import Supplier
-
-# content_type = ContentType.objects.get_for_model(Supplier)
-# post_permission = Permission.objects.filter(content_type=content_type)
-#print([perm.codename for perm in post_permission])
-# for perm in post_permission:
-#     print(perm, perm.codename)
-#     if perm.codename in ('export_excel_50', 'export_excel_100', 'export_excel_1000', 'export_excel_as_admin', 'export_excel_as_staff'):
-#         print ('do remove ', perm.codename)
-#         perm.delete()
-
+from .supportmodels import SupplierChannel
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
@@ -123,38 +114,34 @@ class ExportCsvMixin:
     
     @admin.action(permissions=['syncfollower'], description='Sync follower number',)
     def sync_follower(self, request, queryset):
-        #result = read_followers('https://www.facebook.com/lebaobinh.fan', SupplierChannel.FB_PERSONAL) - success
-        #result = read_followers('https://www.facebook.com/hoquanghieutv', SupplierChannel.FB_PERSONAL)# - fail
-        #result = read_followers('https://www.facebook.com/IQFact', SupplierChannel.FB_FANPAGE) - success
-        #result = read_followers('https://www.facebook.com/fanpageNGLG/', SupplierChannel.FB_FANPAGE) - success
-        #result = read_followers('https://www.facebook.com/groups/groupyanpets/', SupplierChannel.FB_GROUP) - sucecss
-        #result = read_followers('https://www.facebook.com/groups/saigonconfession/', SupplierChannel.FB_GROUP) - success
-        #result = read_followers('https://www.tiktok.com/@tyle1994?lang=vi-VN', SupplierChannel.TIKTOK_PERSONAL) - success
-        #result = read_followers('https://www.tiktok.com/@quynhitraan?lang=vi-VN', SupplierChannel.TIKTOK_PERSONAL) - success
-        # result = read_followers('https://www.tiktok.com/@theanh28entertainment?lang=vi-VN', SupplierChannel.TIKTOK_COMMUNITY) - success
-        # result = read_followers('https://www.tiktok.com/@60giay.com', SupplierChannel.TIKTOK_COMMUNITY) - success
-        # result = read_followers('https://www.youtube.com/user/otosaigon', SupplierChannel.YOUTUBE_COMMUNITY) - success
-        #result = read_followers('https://www.youtube.com/c/ThanhCongTC', SupplierChannel.YOUTUBE_COMMUNITY)
         limit = 4
         if limit > 0 and queryset.count() > limit:
             messages.error(request, "Can't sync more than %s Records in one go." % str(limit))
             return HttpResponseRedirect(request.path_info)
-        driver = prepare_driver()
+        shouldSetupFb = queryset.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0
+        driver = prepare_driver(shouldSetupFb)
         for obj in queryset:
-            result = read_followers(driver, obj.link, obj.channel, False)
-            if result > 0:
-                old_follower = obj.follower
-                obj.follower = convert_to_string_number(result)
-                try:
-                    obj.save()
-                    messages.info(request, obj.name + " was update follower number from " + old_follower + " to " +  str(obj.follower))
-                except Exception as e:
-                    messages.warning(request, obj.name + " can not update follower number, let try manual for this record, the error is " + str(e))
+            result = -1
+            if support_sync(obj.channel):
+                result = read_followers(driver, obj)
+                if result > 0:
+                    old_follower = obj.follower
+                    obj.follower = convert_to_string_number(result)
+                    try:
+                        obj.save()
+                        messages.info(request, obj.name + " was update follower number from " + old_follower + " to " +  str(obj.follower))
+                    except Exception as e:
+                        messages.warning(request, obj.name + " can not update follower number, let try manual for this record, the error is " + str(e))
+                else:
+                    messages.warning(request, obj.name + " can not update follower number, let try manual for this record")
             else:
-                messages.warning(request, obj.name + " can not update follower number, let try manual for this record")
+                messages.warning(request, obj.name + " is not supported this feature")
         if driver:
-            close_driver(driver)
-            driver = None
+            try:
+                close_driver(driver)
+                driver = None
+            except:
+                pass
         
         return HttpResponseRedirect(request.path_info)
 
