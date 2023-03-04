@@ -1,3 +1,5 @@
+Supplier/migrations/
+Supplier/migrations/*
 secrets.json
 nohup.out
 *_env.py
