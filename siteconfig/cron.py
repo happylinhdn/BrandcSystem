@@ -50,7 +50,7 @@ def sync_follower():
                 if old_follower != new_follwer:
                     try:
                         obj.save()
-                        successText += (obj.name + '(%s -> %s),\n' % (old_follower, obj.follower))
+                        successText += (obj.name + '(%s -> %s),\n' % (str(old_follower or ''), str(obj.follower or '')))
                         logSuccess.log = successText
                         logSuccess.save()
                         if len(successText) > 1000:
@@ -58,7 +58,7 @@ def sync_follower():
                             logSuccess = BackgroundLog(log = successText)
 
                     except Exception as e:
-                        failText += (obj.name + '(Save fail %s -> %s),\n' % (old_follower, obj.follower))
+                        failText += (obj.name + '(Save fail %s -> %s),\n' % (str(old_follower or ''), str(obj.follower or '')))
                         logFail.log = failText
                         logFail.save()
                         if len(failText) > 1000:
