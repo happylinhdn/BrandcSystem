@@ -32,9 +32,10 @@ def sync_follower():
     logFail = BackgroundLog(log = '', isSuccess = False)
     
     driver = prepare_driver(True)
-    allSuppliers = Supplier.objects.all()
+    allSuppliers = Supplier.objects.order_by('id')
     for obj in allSuppliers:
         if support_sync(obj.channel):
+            logObj = saveLog(logObj, '%s, '% obj.id, True)
             result = read_followers(driver, obj)
             if result > 0:
                 old_follower = obj.follower
@@ -71,7 +72,7 @@ def sync_follower():
 
 def saveLog(logObj, textLog, isSuccess = True):
     if logObj == None:
-        logObj = BackgroundLog(log = textLog)
+        logObj = BackgroundLog(log = textLog, isSuccess = isSuccess)
     else:
         logObj.isSuccess = isSuccess
         logObj.log = logObj.log + textLog

@@ -23,25 +23,22 @@ def support_sync(channel):
         SupplierChannel.TIKTOK_COMMUNITY,
         SupplierChannel.TIKTOK_PERSONAL,
         SupplierChannel.YOUTUBE_COMMUNITY,
-        SupplierChannel.YOUTUBE_PERSONAL
+        SupplierChannel.YOUTUBE_PERSONAL,
+        SupplierChannel.INSTAGRAM
     ]
     if channel in supports:
         return True
 
-    # if channel == SupplierChannel.FB_GROUP:
-    #     return True
-    # if channel == SupplierChannel.FB_FANPAGE:
-    #     return True
-    # if channel == SupplierChannel.FB_PERSONAL:
-    #     return True
-    # if channel == SupplierChannel.TIKTOK_COMMUNITY:
-    #     return True
-    # if channel == SupplierChannel.TIKTOK_PERSONAL:
-    #     return True
-    # if channel == SupplierChannel.YOUTUBE_COMMUNITY:
-    #     return True
-    # if channel == SupplierChannel.YOUTUBE_PERSONAL:
-    #     return True
+    return False
+
+def isFbChannel(channel):
+    supports = [
+        SupplierChannel.FB_GROUP,
+        SupplierChannel.FB_FANPAGE,
+        SupplierChannel.FB_PERSONAL
+    ]
+    if channel in supports:
+        return True
 
     return False
 
@@ -98,6 +95,12 @@ def login_facebook(driver):
 
 def read_followers(driver, supplier):
     url = supplier.link
+    if url.startswith('http://') or url.startswith('http://') or url.startswith('www.'):
+        pass
+    else:
+        url = 'https://' + url
+
+    print('url', url)
     channel = supplier.channel
     if driver == None:
         return -1
@@ -108,7 +111,12 @@ def read_followers(driver, supplier):
     xPathAddress = prepareXpath(channel)
     
     followers = None
-    driver.get(url)
+    try:
+        driver.get(url)
+    except:
+        print('Can not load this link', url)
+        return -1
+    
     if channel == SupplierChannel.TIKTOK_COMMUNITY or channel == SupplierChannel.TIKTOK_PERSONAL:
         element = findFollowerElementOfTiktok(driver)
         followers = read_element(element)
@@ -118,10 +126,12 @@ def read_followers(driver, supplier):
     elif channel == SupplierChannel.FB_GROUP:
         element = findFbGroupElement(driver)
         followers = read_element(element)
+    elif channel == SupplierChannel.INSTAGRAM:
+        element = findFollowerElementOfInstagram(driver)
+        followers = read_element(element)
     
-    if followers == None and (channel == SupplierChannel.FB_PERSONAL or channel == SupplierChannel.FB_FANPAGE or channel == SupplierChannel.FB_GROUP):
+    if followers == None and isFbChannel(channel):
         if isFbLinkNotValid(driver):
-            print('isFbLinkNotValid = TRUE, stop')
             return -1
         
     if followers == None and len(xPathAddress) > 0:
@@ -134,30 +144,20 @@ def read_followers(driver, supplier):
                     print('read not success for ', channel, url, xpath)
         except:
             print('read not success for ', channel, url)
-        finally:
-            pass
-            # if should_close:
-            #     driver.close()
-            #     driver.quit()
     if followers:
-        value = convert_to_float(followers)
-        print('after followers = ', followers, ' - ', value)
-        return value
+        try:
+            value = convert_to_float(followers)
+            return value
+        except:
+            pass
     return -1
 
 def isFbLinkNotValid(driver):
     try:
-        className = 'xzueoph'
-        allLinks = driver.find_elements(By.CLASS_NAME, className)
-        for div in allLinks:
-            try:
-                contentDiv = div.text
-                if contentDiv == 'Bạn hiện không xem được nội dung này' \
-                    or contentDiv == 'Lỗi này thường do chủ sở hữu chỉ chia sẻ nội dung với một nhóm nhỏ, thay đổi người được xem hoặc đã xóa nội dung.':
-                    return True
-            except Exception as e:
-                pass
-    except Exception as e:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'This content isn't available at the moment')]")
+        if element:
+            return True
+    except:
         pass
     return False
 
@@ -169,7 +169,6 @@ def findFbPersonalElement(driver):
             try:
                 link = a.get_attribute('href')
                 if link and 'followers' in link:
-                    print('link', link)
                     element = a
                     return element
             except Exception as e:
@@ -193,7 +192,7 @@ def findFbGroupElement(driver):
             try:
                 link = a.get_attribute('href')
                 if link and 'members' in link:
-                    print('link', link)
+                    print('FbGroup link', link)
                     element = a
                     return element
             except:
@@ -210,6 +209,14 @@ def findFollowerElementOfTiktok(driver):
         pass
     return None
 
+def findFollowerElementOfInstagram(driver):
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),' followers')]")
+        return element
+    except:
+        pass
+    return None
+
 def read_element(element):
     if element:
         try:
@@ -217,9 +224,11 @@ def read_element(element):
             followers = text.replace('followers','')
             
             followers = followers.replace('people follow this','')
-            followers = followers.replace('members','')
-            followers = followers.replace('subscribers','')
             followers = followers.replace('người theo dõi','')
+            followers = followers.replace('members','')
+            followers = followers.replace('thành viên','')
+            followers = followers.replace('subscribers','')
+            
             followers = followers.replace('people','')
             followers = followers.replace('người','')
             followers = followers.replace('theo dõi','')

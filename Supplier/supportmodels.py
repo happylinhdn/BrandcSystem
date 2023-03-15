@@ -153,7 +153,7 @@ class XPATH(Enum):
     FB_PERSONAL_2 = '//*[@id="mount_0_0_4z"]/div/div[1]/div/div[5]/div/div/div[3]/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div/div/div/div[3]/div/div/div[2]/span/a[1] ' 
     #Not ready
     YOUTUBE_PERSONAL = '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-browse/div[3]/ytd-c4-tabbed-header-renderer/tp-yt-app-header-layout/div/tp-yt-app-header/div[2]/div[2]/div/div[1]/div/div[1]/yt-formatted-string[2]'
-    INSTAGRAM = 'Instagram'
+    INSTAGRAM = '/html/body/div[2]/div/div/div[1]/div/div/div/div[1]/section/main/div/header/section/ul/li[2]/button/div'
     FORUM = 'Forum'
     WEBSITE = 'Website'
     LINKED_IN = 'Linkedin'
