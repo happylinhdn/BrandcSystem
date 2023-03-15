@@ -5,10 +5,8 @@ from Supplier.utility_numbers import *
 import datetime
 
 def sync_follower():
-    log = 'Thread Start,'
-    logObj = BackgroundLog(log = log)
-    logObj.log = log
-    logObj.save()
+    logObj= saveLog(None, 'Thread Start,', True)
+
     should_sync = True
     
     x_date = datetime.date.today()
@@ -26,70 +24,62 @@ def sync_follower():
             break
     driver = None
     if should_sync == False:
-        log += '\n Stop by config, '
-        logObj.log = log
-        logObj.save()
+        logObj = saveLog(logObj, '\n Stop by config, ', True)
         return
 
-    log += '\n Start Sync config,'
-    logObj.log = log
-    logObj.save()
-    successText = ''
-    failText = ''
-    logSuccess = BackgroundLog(log = successText)
-    logFail = BackgroundLog(log = failText, isSuccess = False)
+    logObj = saveLog(logObj, '\n Start Sync config,', True)
+    logSuccess = BackgroundLog(log = '')
+    logFail = BackgroundLog(log = '', isSuccess = False)
     
     driver = prepare_driver(True)
-    for obj in Supplier.objects.all():
+    allSuppliers = Supplier.objects.all()
+    for obj in allSuppliers:
         if support_sync(obj.channel):
             result = read_followers(driver, obj)
             if result > 0:
                 old_follower = obj.follower
                 new_follwer = convert_to_string_number(result)
                 obj.follower = new_follwer
+
                 if old_follower != new_follwer:
                     try:
                         obj.save()
-                        successText += (obj.name + '(%s -> %s),\n' % (str(old_follower or ''), str(obj.follower or '')))
-                        logSuccess.log = successText
-                        logSuccess.save()
-                        if len(successText) > 1000:
-                            successText = ''
-                            logSuccess = BackgroundLog(log = successText)
-
-                    except Exception as e:
-                        failText += (obj.name + '(Save fail %s -> %s),\n' % (str(old_follower or ''), str(obj.follower or '')))
-                        logFail.log = failText
-                        logFail.save()
-                        if len(failText) > 1000:
-                            failText = ''
-                            logFail = BackgroundLog(log = failText, isSuccess = False)
+                        temp_log = (obj.name + '(%s -> %s),\n' % (str(old_follower or ''), str(obj.follower or '')))
+                        logSuccess = saveLog(logSuccess, temp_log, True)
+                    except:
+                        temp_log = obj.name + '(Save fail %s -> %s),\n' % (str(old_follower or ''), str(obj.follower or ''))
+                        logFail = saveLog(logFail, temp_log, False)
                 else:
-                    successText += (obj.name + '(-),\n')
-                    logSuccess.log = successText
-                    logSuccess.save()
+                    temp_log = (obj.name + '(-),\n')
+                    logSuccess = saveLog(logSuccess, temp_log, True)
 
             else:
-                failText += (obj.name + '(%s),\n' % (obj.channel) )
-                logFail.log = failText
-                logFail.save()
-                if len(failText) > 1000:
-                    failText = ''
-                    logFail = BackgroundLog(log = failText, isSuccess = False)
-    log += '\n Finish loop all database '
-    logObj.log = log
-    logObj.save()
+                temp_log = (obj.name + '(%s),\n' % (obj.channel) )
+                logFail = saveLog(logFail, temp_log, False)
+    temp_log = '\n Finish loop all database '
+    logObj = saveLog(logObj, temp_log, True)
     
     if driver:
-        log += '\n Close Driver, '
-        logObj.log = log
-        logObj.save()
+        logObj = saveLog(logObj, '\n Close Driver, ', True)
         try:
             close_driver(driver)
             driver = None
         except:
             pass
+    temp_log = '\n Thread End'
+    logObj = saveLog(logObj, temp_log, True)
+
+def saveLog(logObj, textLog, isSuccess = True):
+    if logObj == None:
+        logObj = BackgroundLog(log = textLog)
+    else:
+        logObj.isSuccess = isSuccess
+        logObj.log = logObj.log + textLog
     
-    log += '\n Thread End'
-    logObj.log = log
     logObj.save()
+    
+    if len(textLog) > 1000:
+        textLog = ''
+        logObj = BackgroundLog(log = textLog, isSuccess = isSuccess)
+
+    return logObj
