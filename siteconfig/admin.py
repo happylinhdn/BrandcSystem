@@ -20,3 +20,4 @@ class BackgroundLogAdmin(admin.ModelAdmin):
 class BackgroundLogAdmin(admin.ModelAdmin):
     readonly_fields=('time', 'log', 'isSuccess')
     list_display = ['id', 'log', 'time', 'isSuccess']
+    search_fields = ['log', 'time']
