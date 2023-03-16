@@ -18,7 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from .utility import *
 
 from .models import Supplier
-from .supportmodels import SupplierChannel
+from .supportmodels import SupplierChannel, support_sync
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):

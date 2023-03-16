@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .supportmodels import SupplierChannel, XPATH
+from .supportmodels import SupplierChannel, XPATH, support_sync, isFbChannel
 from .utility_numbers import *
 import time
 import os
@@ -15,38 +15,15 @@ import json
 from django.conf import settings
 
 ##### MAIN FUNC    
-def support_sync(channel):
-    supports = [
-        SupplierChannel.FB_GROUP,
-        SupplierChannel.FB_FANPAGE,
-        SupplierChannel.FB_PERSONAL,
-        SupplierChannel.TIKTOK_COMMUNITY,
-        SupplierChannel.TIKTOK_PERSONAL,
-        SupplierChannel.YOUTUBE_COMMUNITY,
-        SupplierChannel.YOUTUBE_PERSONAL,
-        SupplierChannel.INSTAGRAM
-    ]
-    if channel in supports:
-        return True
-
-    return False
-
-def isFbChannel(channel):
-    supports = [
-        SupplierChannel.FB_GROUP,
-        SupplierChannel.FB_FANPAGE,
-        SupplierChannel.FB_PERSONAL
-    ]
-    if channel in supports:
-        return True
-
-    return False
-
 def prepare_driver(shouldFbSetup = False):
     options = Options()
-    options.add_argument('--headless')
     options.add_argument('--no-sandbox')
+    options.add_argument('--headless')
     options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--remote-debugging-port=9222')
+    options.add_argument('--crash-dumps-dir=/tmp/selenium_dump/')
+
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     if shouldFbSetup:
         driver = login_facebook(driver)
@@ -58,7 +35,13 @@ def close_driver(driver):
 
 def login_facebook(driver):
     print('Try Login fb')
-    driver.get('https://www.facebook.com/')
+
+    try:
+        driver.get('https://www.facebook.com/')
+    except:
+        print('Can not load fb page')
+        return driver
+
     # Opening JSON file
     
     try:
@@ -89,24 +72,25 @@ def login_facebook(driver):
         currentUrl = driver.current_url
         print('Login fb success -> ', actualTitle, currentUrl)
     except Exception as e:
-        print('SKip login page fb')
+        print('SKip login page fb', str(e))
         time.sleep(2)
     return driver
 
 def read_followers(driver, supplier):
     url = supplier.link
+    print('url', url)
     if url.startswith('http://') or url.startswith('https://') or url.startswith('www.'):
         pass
     else:
         url = 'https://' + url
 
-    print('url', url)
     channel = supplier.channel
     if driver == None:
+        print('Dont know why drive is None')
         return -1
     
     if support_sync(channel) == False:
-        return None
+        return -1
 
     xPathAddress = prepareXpath(channel)
     
@@ -211,9 +195,11 @@ def findFollowerElementOfTiktok(driver):
 
 def findFollowerElementOfInstagram(driver):
     try:
+        time.sleep(3)
         element = driver.find_element(By.XPATH, "//*[contains(text(),' followers')]")
         return element
-    except:
+    except Exception as e:
+        print('findFollowerElementOfInstagram err', str(e))
         pass
     return None
 
@@ -237,34 +223,20 @@ def read_element(element):
             followers = followers.replace('nghìn ','K')
             
             followers = followers.strip()
-            print('read_element followers = ', followers)
+            print('read_element text -> followers: ', text, followers)
             temp = convert_to_float(followers)
             return followers
         except Exception as e:
-            print('read_element not success for ', text)
+            print('read_element not success ', str(e))
             return None
     return None
 
 def prepareXpath(channel):
     xPathAddress = []
-    if channel == SupplierChannel.FB_GROUP:
-        xPathAddress.append(XPATH.FB_GROUP)
-    elif channel == SupplierChannel.FB_FANPAGE:
-        xPathAddress.append(XPATH.FB_FANPAGE_1)
-        xPathAddress.append(XPATH.FB_FANPAGE_2)
-    elif channel == SupplierChannel.FB_PERSONAL:
-        xPathAddress.append(XPATH.FB_PERSONAL_1)
-        xPathAddress.append(XPATH.FB_PERSONAL_2)
-    elif channel == SupplierChannel.TIKTOK_COMMUNITY:
-        xPathAddress.append(XPATH.TIKTOK_COMMUNITY)
-    elif channel == SupplierChannel.TIKTOK_PERSONAL:
-        xPathAddress.append(XPATH.TIKTOK_PERSONAL)
-    elif channel == SupplierChannel.YOUTUBE_COMMUNITY:
+    if channel == SupplierChannel.YOUTUBE_COMMUNITY:
         xPathAddress.append(XPATH.YOUTUBE_COMMUNITY)
     elif channel == SupplierChannel.YOUTUBE_PERSONAL:
         xPathAddress.append(XPATH.YOUTUBE_PERSONAL)
-    elif channel == SupplierChannel.INSTAGRAM:
-        xPathAddress.append(XPATH.INSTAGRAM)
     elif channel == SupplierChannel.FORUM:
         xPathAddress.append(XPATH.FORUM)
     elif channel == SupplierChannel.WEBSITE:

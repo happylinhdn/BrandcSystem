@@ -58,6 +58,25 @@ class Fields(models.TextChoices):
     General = 'General', _('General')
     Other = 'Other', _('Other')
 
+def music_keys():
+    return [
+        Fields.Singer, Fields.Rapper, Fields.DJ, Fields.Music_Producer
+    ]
+
+def entertainment_keys():
+    return [
+        Fields.Dancer, Fields.Streamer, Fields.Content_Creator, Fields.Reviewer, Fields.Blogger
+    ]
+
+def sport_keys():
+    return [
+        Fields.Footballer, Fields.Gymer_Fitness
+    ]
+def financial_keys():
+    return [
+        Fields.Investment, Fields.Insurance, Fields.Economics_Law, Fields.Capital_Market, Fields.Banking
+    ]
+    
 class Location(models.TextChoices):
     All='Toàn Quốc', _('Toàn Quốc')
     AG='An Giang', _('An Giang')
@@ -169,3 +188,31 @@ class Kenh(models.TextChoices):
     Zalo = 'Zalo', _('Zalo')
     Viber = 'Viber', _('Viber')
     Facebook = 'Facebook', _('Facebook')
+
+#######Utility
+def support_sync(channel):
+    supports = [
+        SupplierChannel.FB_GROUP,
+        SupplierChannel.FB_FANPAGE,
+        SupplierChannel.FB_PERSONAL,
+        SupplierChannel.TIKTOK_COMMUNITY,
+        SupplierChannel.TIKTOK_PERSONAL,
+        SupplierChannel.YOUTUBE_COMMUNITY,
+        SupplierChannel.YOUTUBE_PERSONAL,
+        SupplierChannel.INSTAGRAM
+    ]
+    if channel in supports:
+        return True
+
+    return False
+
+def isFbChannel(channel):
+    supports = [
+        SupplierChannel.FB_GROUP,
+        SupplierChannel.FB_FANPAGE,
+        SupplierChannel.FB_PERSONAL
+    ]
+    if channel in supports:
+        return True
+
+    return False

@@ -1,6 +1,6 @@
 from django.contrib.admin import SimpleListFilter
 from .models import Supplier
-from .supportmodels import Fields
+from .supportmodels import Fields, music_keys, entertainment_keys, sport_keys, financial_keys
 from django.utils.translation import gettext as _
 
 class FieldsFilter(SimpleListFilter):
@@ -8,10 +8,54 @@ class FieldsFilter(SimpleListFilter):
     parameter_name = 'field'
 
     def lookups(self, request, model_admin):
+        MusicCategory = 'Music', _('Music')
+        MusicKeys = music_keys()
+        EntertainmentCategory = 'Entertainment', _('Entertainment')
+        EntertainmentKeys = entertainment_keys()
+
+        SportCategory = 'Sport', _('Sport')
+        SportKeys = sport_keys()
+        FinancialCategory = 'Financial', _('Financial')
+        FinancialKeys = financial_keys()
+
         all_choices = Fields.choices
+        others_fields = []
+        all_music_fields = []
+        all_entertainment_fields = []
+        all_sport_fields = []
+        all_financial_fields = []
+        for c in all_choices:
+            if c[0] in MusicKeys:
+                all_music_fields.append(c)
+            elif c[0] in EntertainmentKeys:
+                all_entertainment_fields.append(c)
+            elif c[0] in SportKeys:
+                all_sport_fields.append(c)
+            elif c[0] in FinancialKeys:
+                all_financial_fields.append(c)
+            else:
+                others_fields.append(c)
+            
         t_data = [c.fields for c in Supplier.objects.all()]
         result = []
-        for choice in all_choices:
+
+        result.append(MusicCategory)
+        for c in all_music_fields:
+            result.append(c)
+
+        result.append(EntertainmentCategory)
+        for c in all_entertainment_fields:
+            result.append(c)
+        
+        result.append(SportCategory)
+        for c in all_sport_fields:
+            result.append(c)
+
+        result.append(FinancialCategory)
+        for c in all_financial_fields:
+            result.append(c)
+
+        for choice in others_fields:
             for t in t_data:
                 if choice[0] in t:
                     result.append(choice)
@@ -21,8 +65,29 @@ class FieldsFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         # to decide how to filter the queryset.
         # return queryset.filter(fields__contains=self.value())
-        if self.value():
-            return queryset.filter(fields__contains=self.value())
+        value = self.value()
+        if value == 'Music':
+            return queryset.filter(fields__contains=Fields.Singer) \
+                | queryset.filter(fields__contains=Fields.Rapper) \
+                    | queryset.filter(fields__contains=Fields.DJ) \
+                    | queryset.filter(fields__contains=Fields.Music_Producer)
+        elif value == 'Entertainment':
+            return queryset.filter(fields__contains=Fields.Dancer) \
+                | queryset.filter(fields__contains=Fields.Streamer) \
+                    | queryset.filter(fields__contains=Fields.Content_Creator) \
+                    | queryset.filter(fields__contains=Fields.Reviewer) \
+                        | queryset.filter(fields__contains=Fields.Blogger)
+        elif value == 'Sport':
+            return queryset.filter(fields__contains=Fields.Footballer) \
+                | queryset.filter(fields__contains=Fields.Gymer_Fitness)
+        elif value == 'Financial':
+            return queryset.filter(fields__contains=Fields.Investment) \
+                | queryset.filter(fields__contains=Fields.Insurance) \
+                    | queryset.filter(fields__contains=Fields.Economics_Law) \
+                    | queryset.filter(fields__contains=Fields.Capital_Market) \
+                        | queryset.filter(fields__contains=Fields.Banking)
+        if value:
+            return queryset.filter(fields__contains=value)
 
 #Tính năng Filter: chưa thấy bổ sung thêm Cost Range (<10tr, 10-30tr, 30tr-50tr, 50-70tr, 70-100tr, >100tr)
 class CostRangeFilter(SimpleListFilter):
