@@ -95,7 +95,7 @@ def login_facebook(driver):
 
 def read_followers(driver, supplier):
     url = supplier.link
-    if url.startswith('http://') or url.startswith('http://') or url.startswith('www.'):
+    if url.startswith('http://') or url.startswith('https://') or url.startswith('www.'):
         pass
     else:
         url = 'https://' + url
