@@ -166,6 +166,7 @@ def isFbLinkNotValid(driver):
     return False
 
 def findFbGeneralElement(driver):
+    print('Find by fb general')
     try:
         time.sleep(3)
         elements = driver.find_elements(By.XPATH, '//a[contains(@href, "%s")]' % 'followers')
@@ -178,48 +179,36 @@ def findFbGeneralElement(driver):
             except Exception as e:
                 print('Can not read')
     except Exception as e:
-        print('Can not read')
-    
+        print('Can not read followers')
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'people follow this')]")
+        if element:
+            return element
+    except Exception as e:
+        print('Can not find people follow this')
+
     try:
         element = driver.find_element(By.XPATH, "//*[contains(text(),'người theo dõi')]")
         if element:
             return element
     except Exception as e:
-        print('Can not find tag')
+        print('Can not find người theo dõi')
     
     try:
         element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
         if element and element.text:
             print('found fb members tag')
             return element
-    except:
-        pass
+    except Exception as e:
+        print('Can not find members')
 
     try:
         element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
         if element and element.text:
             print('found fb ThanhVien tag')
             return element
-    except:
-        pass
-
-    try:
-        element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
-        #element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'members')]")))
-        if element and element.text:
-            print('found fb members tag')
-            return element
-    except:
-        pass
-
-    try:
-        element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
-        #element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'Thành viên')]")))
-        if element and element.text:
-            print('found fb ThanhVien tag')
-            return element
-    except:
-        pass
+    except Exception as e:
+        print('Can not find Thành viên')
 
     return None
 

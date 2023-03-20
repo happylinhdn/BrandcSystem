@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
-
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,13 +81,6 @@ WSGI_APPLICATION = 'BrandcSystem.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
-
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.postgresql_psycopg2',
@@ -98,6 +91,19 @@ DATABASES = {
         'PORT':'5432'
     }
 }
+
+with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
+    data = json.load(secrets_file)
+    email = data['s1']
+    pwd = data['s2']
+    local = data['local']
+    if local:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 
 # Password validation
@@ -156,6 +162,6 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 IMPORT_EXPORT_CHUNK_SIZE = 100
 
 CRONJOBS = [
-    ('00 18 * * *', 'siteconfig.cron.sync_follower', '>> /tmp/scheduled_job.log'), #13:00
+    ('00 19 * * *', 'siteconfig.cron.sync_follower', '>> /tmp/scheduled_job.log'), #02:00
     #('*/5 * * * *', 'django.core.management.call_command', ['fetchfollower','--all']),
 ]
