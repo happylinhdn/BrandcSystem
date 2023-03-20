@@ -3,7 +3,7 @@ from .models import BackgroundLog, SyncConfig
 
 # Register your models here.
 @admin.register(SyncConfig)
-class BackgroundLogAdmin(admin.ModelAdmin):
+class SyncConfigAdmin(admin.ModelAdmin):
     readonly_fields=('name', )
     list_display = ['id', 'name', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
     fieldsets = (
@@ -21,3 +21,5 @@ class BackgroundLogAdmin(admin.ModelAdmin):
     readonly_fields=('time', 'log', 'isSuccess')
     list_display = ['id', 'isSuccess','log','time']
     search_fields = ['log']
+    list_filter = ['isSuccess']
+    

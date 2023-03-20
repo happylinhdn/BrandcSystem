@@ -13,6 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
 from django.conf import settings
+from urllib.parse import urlparse
 
 ##### MAIN FUNC    
 def prepare_driver(shouldFbSetup = False):
@@ -20,7 +21,7 @@ def prepare_driver(shouldFbSetup = False):
     options.add_argument('--no-sandbox')
     options.add_argument('--headless')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--remote-debugging-port=9222')
+    #options.add_argument('--remote-debugging-port=9222')
     options.add_argument('--crash-dumps-dir=/tmp/selenium_dump/')
 
 
@@ -77,19 +78,20 @@ def login_facebook(driver):
     return driver
 
 def read_followers(driver, supplier):
-    url = supplier.link
-    print('url', url)
-    if url.startswith('http://') or url.startswith('https://') or url.startswith('www.'):
+    url = supplier.link.strip()
+    if url.startswith('http://') or url.startswith('https://'):
         pass
     else:
         url = 'https://' + url
 
     channel = supplier.channel
+    print('url-channel', url, channel)
     if driver == None:
         print('Dont know why drive is None')
         return -1
     
     if support_sync(channel) == False:
+        print('Dont know why not support channel', channel)
         return -1
 
     xPathAddress = prepareXpath(channel)
@@ -100,19 +102,31 @@ def read_followers(driver, supplier):
     except:
         print('Can not load this link', url)
         return -1
-    
+    if isFbChannel(channel):
+        if isFbLinkNotValid(driver):
+            print('This kol is not valid')
+            return -1
+
     if channel == SupplierChannel.TIKTOK_COMMUNITY or channel == SupplierChannel.TIKTOK_PERSONAL:
         element = findFollowerElementOfTiktok(driver)
+        if element:
+            followers = read_element(element)
+    elif isFbChannel(channel):
+        element = findFbGeneralElement(driver)
         followers = read_element(element)
-    elif channel == SupplierChannel.FB_PERSONAL or channel == SupplierChannel.FB_FANPAGE:
-        element = findFbPersonalElement(driver)
-        followers = read_element(element)
-    elif channel == SupplierChannel.FB_GROUP:
-        element = findFbGroupElement(driver)
-        followers = read_element(element)
+        if followers == None:
+            element = findFbPersonalElement(driver)
+            followers = read_element(element)
+        if followers == None:
+            element = findFbFanPageElement(driver, url)
+            followers = read_element(element)
+        if followers == None:
+            element = findFbGroupElement(driver, url)
+            followers = read_element(element)
     elif channel == SupplierChannel.INSTAGRAM:
         element = findFollowerElementOfInstagram(driver)
-        followers = read_element(element)
+        if element:
+            followers = read_element(element)
     
     if followers == None and isFbChannel(channel):
         if isFbLinkNotValid(driver):
@@ -143,7 +157,71 @@ def isFbLinkNotValid(driver):
             return True
     except:
         pass
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'Bạn hiện không xem được nội dung này')]")
+        if element:
+            return True
+    except:
+        pass
     return False
+
+def findFbGeneralElement(driver):
+    try:
+        time.sleep(3)
+        elements = driver.find_elements(By.XPATH, '//a[contains(@href, "%s")]' % 'followers')
+        for a in elements:
+            try:
+                link = a.get_attribute('href')
+                if link and 'followers' in link:
+                    element = a
+                    return element
+            except Exception as e:
+                print('Can not read')
+    except Exception as e:
+        print('Can not read')
+    
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'người theo dõi')]")
+        if element:
+            return element
+    except Exception as e:
+        print('Can not find tag')
+    
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
+        if element and element.text:
+            print('found fb members tag')
+            return element
+    except:
+        pass
+
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
+        if element and element.text:
+            print('found fb ThanhVien tag')
+            return element
+    except:
+        pass
+
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
+        #element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'members')]")))
+        if element and element.text:
+            print('found fb members tag')
+            return element
+    except:
+        pass
+
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
+        #element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'Thành viên')]")))
+        if element and element.text:
+            print('found fb ThanhVien tag')
+            return element
+    except:
+        pass
+
+    return None
 
 def findFbPersonalElement(driver):
     try:
@@ -156,9 +234,9 @@ def findFbPersonalElement(driver):
                     element = a
                     return element
             except Exception as e:
-                print('Can not read', str(e))
+                print('Can not read')
     except Exception as e:
-        print('Can not read', str(e))
+        print('Can not read')
     
     try:
         element = driver.find_element(By.XPATH, "//*[contains(text(),' người theo dõi Trang này')]")
@@ -168,21 +246,97 @@ def findFbPersonalElement(driver):
         pass
     return None
 
-def findFbGroupElement(driver):
+def findFbFanPageElement(driver, url):
     try:
-        time.sleep(3)
+        path = url
+        p = urlparse(path)
+        new_url = str(p.scheme) + "://" + p.netloc + p.path.removesuffix('/') + '/members'
+        driver.get(new_url)
+        time.sleep(2)
         elements = driver.find_elements(By.XPATH, '//a[contains(@href, "%s")]' % 'members')
         for a in elements:
             try:
                 link = a.get_attribute('href')
                 if link and 'members' in link:
-                    print('FbGroup link', link)
+                    print('FbFanPage link', link, a.text)
                     element = a
-                    return element
-            except:
-                pass 
+                    element.click()
+                    time.sleep(2)
+                    break
+            except Exception as e:
+                print('Can not read')
+    except Exception as e:
+        print('Can not read')
+    
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'người theo dõi')]")
+        if element:
+            return element
+    except Exception as e:
+        print('Can not find tag')
+    
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
+        if element and element.text:
+            print('found fb members tag')
+            return element
     except:
         pass
+
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
+        if element and element.text:
+            print('found fb ThanhVien tag')
+            return element
+    except:
+        pass
+
+    return None
+
+def findFbGroupElement(driver, url):
+    print('try find by group')
+    try:
+        path = url
+        p = urlparse(path)
+        new_url = str(p.scheme) + "://" + p.netloc + p.path.removesuffix('/') + '/members/'
+        driver.get(new_url)
+        print('new_url', new_url)
+        time.sleep(2)
+
+        elements = driver.find_elements(By.XPATH, "//a[contains(@href, 'members')]")
+        for a in elements:
+            try:
+                link = a.get_attribute('href')
+                if link and 'members' in link:
+                    print('FbGroup link', link, a.text)
+                    element = a
+                    element.click()
+                    time.sleep(2)
+                    break
+                    #return element
+            except Exception as e:
+                print('find fb group error', str(e))
+    except Exception as e:
+        print('find fb group error 2', str(e))
+    
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
+        #element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'members')]")))
+        if element and element.text:
+            print('found fb members tag')
+            return element
+    except:
+        pass
+
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
+        #element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'Thành viên')]")))
+        if element and element.text:
+            print('found fb ThanhVien tag')
+            return element
+    except:
+        pass
+
     return None
 
 def findFollowerElementOfTiktok(driver):
@@ -206,25 +360,29 @@ def findFollowerElementOfInstagram(driver):
 def read_element(element):
     if element:
         try:
-            text = element.text
-            followers = text.replace('followers','')
+            text = element.text.upper()
+            print('text', text)
+            followers = text.replace('FOLLOWERS','')
             
-            followers = followers.replace('people follow this','')
-            followers = followers.replace('người theo dõi','')
-            followers = followers.replace('members','')
-            followers = followers.replace('thành viên','')
-            followers = followers.replace('subscribers','')
+            followers = followers.replace('PEOPLE FOLLOW THIS','')
+            followers = followers.replace('NGƯỜI THEO DÕI','')
+            followers = followers.replace('MEMBERS','')
+            followers = followers.replace('THÀNH VIÊN','')
+            followers = followers.replace('· ','')
+            followers = followers.replace('SUBSCRIBERS','')
             
-            followers = followers.replace('people','')
-            followers = followers.replace('người','')
-            followers = followers.replace('theo dõi','')
-            followers = followers.replace('triệu ','M')
-            followers = followers.replace('ngàn ','K')
-            followers = followers.replace('nghìn ','K')
+            followers = followers.replace('PEOPLE','')
+            followers = followers.replace('NGƯỜI','')
+            followers = followers.replace('THEO DÕI','')
+            followers = followers.replace('TRIỆU ','M')
+            followers = followers.replace('NGÀN ','K')
+            followers = followers.replace('NGHÌN ','K')
             
             followers = followers.strip()
             print('read_element text -> followers: ', text, followers)
             temp = convert_to_float(followers)
+
+            
             return followers
         except Exception as e:
             print('read_element not success ', str(e))

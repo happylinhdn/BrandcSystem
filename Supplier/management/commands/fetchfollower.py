@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
                 # poll.opened = False
                 # poll.save()
-                supplier.booking_contact_phone = 'Linh test \n' + (supplier.booking_contact_phone or '')
+                # supplier.booking_contact_phone = 'Linh test \n' + (supplier.booking_contact_phone or '')
                 supplier.save()
 
                 self.stdout.write(self.style.SUCCESS('Successfully Read Supplier "%s"' % supplier_id))
