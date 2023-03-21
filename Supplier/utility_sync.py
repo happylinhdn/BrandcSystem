@@ -3,6 +3,7 @@ from siteconfig.models import BackgroundLog, SyncConfig
 import datetime
 from Supplier.utility import *
 from Supplier.utility_numbers import *
+from django.utils import timezone
 
 class SyncUtility:
     def should_sync(self):
@@ -66,7 +67,7 @@ class SyncUtility:
             if support_sync(obj.channel):
                 logObj = self.saveLog(logObj, '%s, '% obj.id, True)
                 result = read_followers(driver, obj)
-                if result > 0:
+                if result >= 0:
                     old_follower = obj.follower
                     new_follwer = convert_to_string_number(result)
                     obj.follower = new_follwer
@@ -74,14 +75,15 @@ class SyncUtility:
                     if old_follower != new_follwer:
                         try:
                             obj.save()
-                            temp_log = (obj.name + '(%s -> %s),' % (str(old_follower or ''), str(obj.follower or '')))
-                            logSuccess = self.saveLog(logSuccess, temp_log, True)
+                            #temp_log = (obj.name + '(%s -> %s),' % (str(old_follower or ''), str(obj.follower or '')))
+                            #logSuccess = self.saveLog(logSuccess, temp_log, True)
                         except:
                             temp_log = obj.name + '(Save fail %s -> %s),' % (str(old_follower or ''), str(obj.follower or ''))
                             logFail = self.saveLog(logFail, temp_log, False)
                     else:
-                        temp_log = (obj.name + '(-),')
-                        logSuccess = self.saveLog(logSuccess, temp_log, True)
+                        pass
+                        #temp_log = (obj.name + '(-),')
+                        #logSuccess = self.saveLog(logSuccess, temp_log, True)
 
                 else:
                     failDatas.append(obj)
@@ -123,14 +125,15 @@ class SyncUtility:
                     if old_follower != new_follwer:
                         try:
                             obj.save()
-                            temp_log = (obj.name + '(%s -> %s),' % (str(old_follower or ''), str(obj.follower or '')))
-                            logSuccess = self.saveLog(logSuccess, temp_log, True)
+                            #temp_log = (obj.name + '(%s -> %s),' % (str(old_follower or ''), str(obj.follower or '')))
+                            #logSuccess = self.saveLog(logSuccess, temp_log, True)
                         except:
                             temp_log = obj.name + '(Save fail %s -> %s),' % (str(old_follower or ''), str(obj.follower or ''))
                             logFail = self.saveLog(logFail, temp_log, False)
                     else:
-                        temp_log = (obj.name + '(-),')
-                        logSuccess = self.saveLog(logSuccess, temp_log, True)
+                        pass
+                        #temp_log = (obj.name + '(-),')
+                        #logSuccess = self.saveLog(logSuccess, temp_log, True)
 
                 else:
                     temp_log = (obj.name + '(%s),' % (obj.id) )
@@ -154,8 +157,8 @@ class SyncUtility:
         if logInstance == None:
             logInstance = BackgroundLog(log = textLog, isSuccess = isSuccess)
         else:
-            logInstance.isSuccess = isSuccess
             logInstance.log = logInstance.log + textLog
+            logInstance.time = timezone.now()
         
         logInstance.save()
     
