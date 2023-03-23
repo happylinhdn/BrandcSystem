@@ -31,7 +31,7 @@ class Supplier(models.Model):
         ])
     gender = models.CharField(max_length=10, choices=Gender.choices, null=True)
     
-    fields = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
+    industries = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
     #ORIGINAL COST
     original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True)
     original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True)
@@ -126,21 +126,21 @@ class Supplier(models.Model):
         if self.location not in (key[0] for key in Location.choices):
             raise Exception('Location is not valid: ' + str(self.location or ''))
 
-        if self.fields is None:
-            raise Exception('Fields can not empty')
+        if self.industries is None:
+            raise Exception('Industries can not empty')
         
-        if self.fields and type(self.fields) == str:
+        if self.industries and type(self.industries) == str:
             valid = []
-            fields = (f.strip() for f in self.fields.split(",")) 
+            industries = (f.strip() for f in self.industries.split(",")) 
             all_fields = Fields.choices
 
-            for field in fields:
+            for field in industries:
                 if field and field not in (key[0] for key in all_fields):
                     print('Field is not valid:' + str(field or ''))
                     raise Exception('Field is not valid:' + str(field or ''))
                 else:
                     valid.append(field)
-            self.fields = ','.join(valid)
+            self.industries = ','.join(valid)
         
         if self.channel is None:
             raise Exception('Channel can not empty')
@@ -178,7 +178,7 @@ class Supplier(models.Model):
             'LOCATION': self.location,
             'YEAR': self.year_of_birth,
             'GENDER': self.gender,
-            'FIELDS': self.fields,
+            'INDUSTRIES': self.industries,
             'ORIGINAL COST - PICTURE': int(self.original_cost_picture or 0),
             'ORIGINAL COST - VIDEO':int(self.original_cost_video or 0),
             'ORIGINAL COST - EVENT': int(self.original_cost_event or 0),

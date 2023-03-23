@@ -58,25 +58,70 @@ class Fields(models.TextChoices):
     General = 'General', _('General')
     Other = 'Other', _('Other')
 
-def music_keys():
+def Music_keys():
     return [
         Fields.Singer, Fields.Rapper, Fields.DJ, Fields.Music_Producer
     ]
 
-def entertainment_keys():
+def Entertainment_keys():
     return [
         Fields.Dancer, Fields.Streamer, Fields.Content_Creator, Fields.Reviewer, Fields.Blogger
     ]
 
-def sport_keys():
-    return [
-        Fields.Footballer, Fields.Gymer_Fitness
-    ]
-def financial_keys():
+def Sport_keys():
+    return [Fields.Footballer, Fields.Gymer_Fitness]
+def Artist_keys():
+    return [ Fields.Model, Fields.Showbiz]
+def Beauty_keys():
+    return [ Fields.Make_up, Fields.Cosmestic_Skincare]
+def Life_Society_keys():
+    return [ Fields.Fashion, Fields.Travel, Fields.Lifestyle, Fields.News, Fields.Education]
+def Occupation_keys():
+    return [ Fields.Teacher_Coach, Fields.Office_staff, Fields.Freelancer, Fields.Business, Fields.Lawyer, Fields.Student, Fields.Doctor]
+
+def Property_Real_estate_keys():
+    return [ Fields.Architect, Fields.Smarthome, Fields.Home_Appliance, Fields.Interior_House, Fields.Decor_Design, Fields.Real_Estate]
+
+def Property_Real_estate_keys():
+    return [ Fields.Architect, Fields.Smarthome, Fields.Home_Appliance, Fields.Interior_House, Fields.Decor_Design, Fields.Real_Estate]
+
+def Financial_keys():
     return [
         Fields.Investment, Fields.Insurance, Fields.Economics_Law, Fields.Capital_Market, Fields.Banking
     ]
-    
+
+def Family_keys():
+    return [ Fields.Kid, Fields.Hot_Mom_Dad]
+
+def Automotive_keys():
+    return [ Fields.Automotive]
+def Director_keys():
+    return [ Fields.Director]
+def Actor_Actress_keys():
+    return [ Fields.Actor_Actress]
+def Health_Medicine_keys():
+    return [ Fields.Health_Medicine]
+def Youth_GenZ_keys():
+    return [ Fields.Youth_GenZ]
+def Media_Advertisement_keys():
+    return [ Fields.Media_Advertisement]
+def Game_Esport_keys():
+    return [ Fields.Game_Esport]
+def MC_Editor_keys():
+    return [ Fields.MC_Editor]
+
+def Food_Drink_keys():
+    return [ Fields.Food_Drink]
+
+def Technology_Ecommerce_keys():
+    return [ Fields.Technology_Ecommerce]
+def Celeb_keys():
+    return [ Fields.Celeb]
+def General_keys():
+    return [ Fields.General]
+def Other_keys():
+    return [ Fields.Other]
+
 class Location(models.TextChoices):
     All='Toàn Quốc', _('Toàn Quốc')
     AG='An Giang', _('An Giang')

@@ -1,22 +1,295 @@
 from django.contrib.admin import SimpleListFilter
 from .models import Supplier
-from .supportmodels import Fields, music_keys, entertainment_keys, sport_keys, financial_keys
+from .supportmodels import *
+from django.db.models.query import QuerySet
 from django.utils.translation import gettext as _
 
+MusicCategory = 'Music', _('1. Music')
+EntertainmentCategory = 'Entertainment', _('2. Entertainment')
+SportCategory = 'Sport', _('3. Sport')
+ArtistCategory = 'Artist', _('4. Artist')
+BeautyCategory = 'Beauty', _('5. Beauty')
+Life_SocietyCategory = 'Life & SocietyCategory', _('6. Life & Society')
+OccupationCategory = 'Occupation', _('7. Occupation')
+Property_RealEstateCategory = 'Property & Real estate', _('8. Property & Real estate')
+FinancialCategory = 'Financial', _('9. Financial')
+FamilyCategory = 'Family', _('10. Family')
+AutomotiveCategory = 'Automotive', _('11. Automotive')
+DirectorCategory = 'Director', _('12. Director')
+Actor_ActressCategory = 'Actor/Actress', _('13. Actor/Actress')
+Health_MedicineCategory = 'Health & Medicine', _('14. Health & Medicine')
+Youth_GenZCategory = 'Youth & GenZ', _('15. Youth & GenZ')
+Media_AdvertisementCategory = 'Media & Advertisement', _('16. Media & Advertisement')
+Game_EsportCategory = 'Game & Esport', _('17. Game & Esport')
+MC_EditorCategory = 'MC & Editor', _('18. MC & Editor')
+Food_DrinkCategory = 'Food & Drink', _('19. Food & Drink')
+Technology_EcommerceCategory = 'Technology & Ecommerce', _('20. Technology & Ecommerce')
+CelebCategory = 'Celeb', _('21. Celeb')
+GeneralCategory = 'General', _('22. General')
+OtherCategory = 'Other', _('23. Other')
+
+class IndustryFilter(SimpleListFilter):
+    title = 'Industries'
+    parameter_name = 'industries'
+
+    def lookups(self, request, model_admin):
+        all_choices = Fields.choices
+        
+        all_Music_fields = []
+        all_Entertainment_fields = []
+        all_Sport_fields = []
+        all_Artist_fields = []
+        all_Beauty_fields = []
+        all_Life_Society_fields = []
+        all_Occupation_fields = []
+        all_Property_RealEstate_fields = []
+        all_Financial_fields = []
+        all_Family_fields = []
+
+        all_Automotive_fields = []
+        all_Director_fields = []
+        all_Actor_Actress_fields = []
+        all_Health_Medicine_fields = []
+        all_Youth_GenZ_fields = []
+        all_Media_Advertisement_fields = []
+        all_Game_Esport_fields = []
+        all_MC_Editor_fields = []
+        all_Food_Drink_fields = []
+        all_Technology_Ecommerce_fields = []
+        all_Celeb_fields = []
+        all_General_fields = []
+        all_Other_fields = []
+
+        for c in all_choices:
+            if c[0] in Music_keys():
+                all_Music_fields.append(c)
+            elif c[0] in Entertainment_keys():
+                all_Entertainment_fields.append(c)
+            elif c[0] in Sport_keys():
+                all_Sport_fields.append(c)
+            elif c[0] in Artist_keys():
+                all_Artist_fields.append(c)
+            if c[0] in Beauty_keys():
+                all_Beauty_fields.append(c)
+            elif c[0] in Life_Society_keys():
+                all_Life_Society_fields.append(c)
+            elif c[0] in Occupation_keys():
+                all_Occupation_fields.append(c)
+            elif c[0] in Property_Real_estate_keys():
+                all_Property_RealEstate_fields.append(c)
+            if c[0] in Financial_keys():
+                all_Financial_fields.append(c)
+            elif c[0] in Family_keys():
+                all_Family_fields.append(c)
+            # elif c[0] in Automotive_keys():
+            #     all_Automotive_fields.append(c)
+            # elif c[0] in Director_keys():
+            #     all_Director_fields.append(c)
+            # if c[0] in Actor_Actress_keys():
+            #     all_Actor_Actress_fields.append(c)
+            # elif c[0] in Health_Medicine_keys():
+            #     all_Health_Medicine_fields.append(c)
+            # elif c[0] in Youth_GenZ_keys():
+            #     all_Youth_GenZ_fields.append(c)
+            # elif c[0] in Media_Advertisement_keys():
+            #     all_Media_Advertisement_fields.append(c)
+            # elif c[0] in Game_Esport_keys():
+            #     all_Game_Esport_fields.append(c)
+            # elif c[0] in MC_Editor_keys():
+            #     all_MC_Editor_fields.append(c)
+            # elif c[0] in Food_Drink_keys():
+            #     all_Food_Drink_fields.append(c)
+            # elif c[0] in Technology_Ecommerce_keys():
+            #     all_Technology_Ecommerce_fields.append(c)
+            # elif c[0] in Celeb_keys():
+            #     all_Celeb_fields.append(c)
+            # elif c[0] in General_keys():
+            #     all_General_fields.append(c)
+            # elif c[0] in Other_keys():
+            #     all_Other_fields.append(c)
+            
+            
+        t_data = [c.industries for c in Supplier.objects.all()]
+        result = []
+
+        result.append(MusicCategory)
+        for c in all_Music_fields:
+            result.append(c)
+
+        result.append(EntertainmentCategory)
+        for c in all_Entertainment_fields:
+            result.append(c)
+        
+        result.append(SportCategory)
+        for c in all_Sport_fields:
+            result.append(c)
+        
+        result.append(ArtistCategory)
+        for c in all_Artist_fields:
+            result.append(c)
+        
+        result.append(BeautyCategory)
+        for c in all_Beauty_fields:
+            result.append(c)
+
+        result.append(Life_SocietyCategory)
+        for c in all_Life_Society_fields:
+            result.append(c)
+
+        result.append(OccupationCategory)
+        for c in all_Occupation_fields:
+            result.append(c)
+        result.append(Property_RealEstateCategory)
+        for c in all_Property_RealEstate_fields:
+            result.append(c)
+        result.append(FinancialCategory)
+        for c in all_Financial_fields:
+            result.append(c)
+        result.append(FamilyCategory)
+        for c in all_Family_fields:
+            result.append(c)
+        result.append(AutomotiveCategory)
+        for c in all_Automotive_fields:
+            result.append(c)
+
+        result.append(DirectorCategory)
+        for c in all_Director_fields:
+            result.append(c)
+        
+        result.append(Actor_ActressCategory)
+        for c in all_Actor_Actress_fields:
+            result.append(c)
+
+        result.append(Health_MedicineCategory)
+        for c in all_Health_Medicine_fields:
+            result.append(c)
+
+        result.append(Youth_GenZCategory)
+        for c in all_Youth_GenZ_fields:
+            result.append(c)
+
+        result.append(Media_AdvertisementCategory)
+        for c in all_Media_Advertisement_fields:
+            result.append(c)
+
+        result.append(Game_EsportCategory)
+        for c in all_Game_Esport_fields:
+            result.append(c)
+        result.append(MC_EditorCategory)
+        for c in all_MC_Editor_fields:
+            result.append(c)
+        result.append(Food_DrinkCategory)
+        for c in all_Food_Drink_fields:
+            result.append(c)
+        
+        result.append(Technology_EcommerceCategory)
+        for c in all_Technology_Ecommerce_fields:
+            result.append(c)
+        result.append(CelebCategory)
+        for c in all_Celeb_fields:
+            result.append(c)
+        result.append(GeneralCategory)
+        for c in all_General_fields:
+            result.append(c)
+        result.append(OtherCategory)
+        for c in all_Other_fields:
+            result.append(c)
+
+
+        # for choice in others_fields:
+        #     for t in t_data:
+        #         if choice[0] in t:
+        #             result.append(choice)
+        #             break
+        return result
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value:
+            
+            data = queryset.filter(industries__contains=value)
+            if value == MusicCategory[0]:
+                for f in Music_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == EntertainmentCategory[0]:
+                for f in Entertainment_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == SportCategory[0]:
+                for f in Sport_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == ArtistCategory[0]:
+                for f in Artist_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == BeautyCategory[0]:
+                for f in Beauty_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Life_SocietyCategory[0]:
+                for f in Life_Society_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == OccupationCategory[0]:
+                for f in Occupation_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Property_RealEstateCategory[0]:
+                for f in Property_Real_estate_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == FinancialCategory[0]:
+                for f in Financial_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == FamilyCategory[0]:
+                for f in Family_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == AutomotiveCategory[0]:
+                for f in Automotive_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == DirectorCategory[0]:
+                for f in Director_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Actor_ActressCategory[0]:
+                for f in Actor_Actress_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Health_MedicineCategory[0]:
+                for f in Health_Medicine_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Youth_GenZCategory[0]:
+                for f in Youth_GenZ_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Media_AdvertisementCategory[0]:
+                for f in Media_Advertisement_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Game_EsportCategory[0]:
+                for f in Game_Esport_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == MC_EditorCategory[0]:
+                for f in MC_Editor_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Food_DrinkCategory[0]:
+                for f in Food_Drink_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == Technology_EcommerceCategory[0]:
+                for f in Technology_Ecommerce_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == CelebCategory[0]:
+                for f in Celeb_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == GeneralCategory[0]:
+                for f in General_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            elif value == OtherCategory[0]:
+                for f in Other_keys():
+                    data = data | queryset.filter(industries__contains=f)
+            
+            return data
+
 class FieldsFilter(SimpleListFilter):
-    title = 'Fields' # or use _('country') for translated title
+    title = 'Fields'
     parameter_name = 'field'
 
     def lookups(self, request, model_admin):
-        MusicCategory = 'Music', _('Music')
-        MusicKeys = music_keys()
-        EntertainmentCategory = 'Entertainment', _('Entertainment')
-        EntertainmentKeys = entertainment_keys()
+        MusicKeys = Music_keys()
+        EntertainmentKeys = Entertainment_keys()
 
-        SportCategory = 'Sport', _('Sport')
-        SportKeys = sport_keys()
-        FinancialCategory = 'Financial', _('Financial')
-        FinancialKeys = financial_keys()
+        SportKeys = Sport_keys()
+        FinancialKeys = Financial_keys()
 
         all_choices = Fields.choices
         others_fields = []
@@ -36,7 +309,7 @@ class FieldsFilter(SimpleListFilter):
             else:
                 others_fields.append(c)
             
-        t_data = [c.fields for c in Supplier.objects.all()]
+        t_data = [c.industries for c in Supplier.objects.all()]
         result = []
 
         result.append(MusicCategory)
@@ -66,21 +339,21 @@ class FieldsFilter(SimpleListFilter):
         # to decide how to filter the queryset.
         # return queryset.filter(fields__contains=self.value())
         value = self.value()
-        if value == 'Music':
+        if value == MusicCategory[0]:
             return queryset.filter(fields__contains=Fields.Singer) \
                 | queryset.filter(fields__contains=Fields.Rapper) \
                     | queryset.filter(fields__contains=Fields.DJ) \
                     | queryset.filter(fields__contains=Fields.Music_Producer)
-        elif value == 'Entertainment':
+        elif value == EntertainmentCategory[0]:
             return queryset.filter(fields__contains=Fields.Dancer) \
                 | queryset.filter(fields__contains=Fields.Streamer) \
                     | queryset.filter(fields__contains=Fields.Content_Creator) \
                     | queryset.filter(fields__contains=Fields.Reviewer) \
                         | queryset.filter(fields__contains=Fields.Blogger)
-        elif value == 'Sport':
+        elif value == SportCategory[0]:
             return queryset.filter(fields__contains=Fields.Footballer) \
                 | queryset.filter(fields__contains=Fields.Gymer_Fitness)
-        elif value == 'Financial':
+        elif value == FinancialCategory[0]:
             return queryset.filter(fields__contains=Fields.Investment) \
                 | queryset.filter(fields__contains=Fields.Insurance) \
                     | queryset.filter(fields__contains=Fields.Economics_Law) \

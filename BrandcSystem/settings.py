@@ -162,6 +162,6 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 IMPORT_EXPORT_CHUNK_SIZE = 100
 
 CRONJOBS = [
-    ('00 19 * * *', 'siteconfig.cron.sync_follower', '>> /tmp/scheduled_job.log'), #02:00
+    ('00 16 * * *', 'siteconfig.cron.sync_follower', '>> /tmp/scheduled_job.log'), #23:00
     #('*/5 * * * *', 'django.core.management.call_command', ['fetchfollower','--all']),
 ]

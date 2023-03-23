@@ -10,6 +10,7 @@ class SyncUtility:
         should_sync = True
         x_date = datetime.date.today()
         no = x_date.weekday()
+        self.saveLog(None, 'should_sync today is %s' % no, True)
 
         for config in SyncConfig.objects.all():
             if config.name == 'Sync follower' :

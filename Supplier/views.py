@@ -69,7 +69,7 @@ def update_supplier(supplier, d):
     supplier.location = d[6]
     supplier.year_of_birth = d[7]
     supplier.gender = d[8]
-    supplier.fields = d[9]
+    supplier.industries = d[9]
     supplier.original_cost_picture = d[10]
     supplier.original_cost_video = d[11]
     supplier.original_cost_event = d[12]
