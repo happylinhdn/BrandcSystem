@@ -10,7 +10,7 @@ class SyncUtility:
         should_sync = True
         x_date = datetime.date.today()
         no = x_date.weekday()
-        self.saveLog(None, 'should_sync today is %s' % no, True)
+        #self.saveLog(None, 'should_sync today is %s' % no, True)
 
         for config in SyncConfig.objects.all():
             if config.name == 'Sync follower' :
@@ -59,7 +59,7 @@ class SyncUtility:
         driver = None
         logObj = self.saveLog(None, 'sync_suppliers START,', True)
         try:
-            driver = prepare_driver(True)
+            driver = prepare_driver(True, True)
         except:
             logObj = self.saveLog(logObj, 'Init driver fail,', True)
             return
@@ -109,7 +109,7 @@ class SyncUtility:
         logSuccess = None
         logFail = None
         try:
-            driver = prepare_driver(True)
+            driver = prepare_driver(True, True)
         except:
             logObj = self.saveLog(logObj, 'Init driver fail,', True)
             return
@@ -118,7 +118,7 @@ class SyncUtility:
             if support_sync(obj.channel):
                 logObj = self.saveLog(logObj, '%s, '% obj.id, True)
                 result = read_followers(driver, obj)
-                if result > 0:
+                if result >= 0:
                     old_follower = obj.follower
                     new_follwer = convert_to_string_number(result)
                     obj.follower = new_follwer

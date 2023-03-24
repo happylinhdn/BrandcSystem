@@ -19,6 +19,7 @@ from .utility import *
 
 from .models import Supplier
 from .supportmodels import SupplierChannel, support_sync
+from Supplier.utility_sync import SyncUtility
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
@@ -118,8 +119,11 @@ class ExportCsvMixin:
         if limit > 0 and queryset.count() > limit:
             messages.error(request, "Can't sync more than %s Records in one go." % str(limit))
             return HttpResponseRedirect(request.path_info)
+        
         shouldSetupFb = queryset.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0
-        driver = prepare_driver(shouldSetupFb)
+        shouldSetupInstagram = queryset.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
+        
+        driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
         for obj in queryset:
             result = -1
             if support_sync(obj.channel):

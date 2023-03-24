@@ -16,23 +16,72 @@ from django.conf import settings
 from urllib.parse import urlparse
 
 ##### MAIN FUNC    
-def prepare_driver(shouldFbSetup = False):
+def prepare_driver(shouldFbSetup = False, shouldInstagramSetup = False):
     options = Options()
     options.add_argument('--no-sandbox')
     options.add_argument('--headless')
     options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--lang=en-US')
     #options.add_argument('--remote-debugging-port=9222')
     options.add_argument('--crash-dumps-dir=/tmp/selenium_dump/')
 
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    if shouldInstagramSetup:
+        driver = login_instagram(driver)
+
     if shouldFbSetup:
         driver = login_facebook(driver)
+    
     return driver
 
 def close_driver(driver):
     driver.close()
     driver.quit()
+
+def login_instagram(driver):
+    print('Try Login instagram')
+
+    try:
+        driver.get('https://www.instagram.com/accounts/login/')
+        time.sleep(10)
+    except:
+        print('Can not load instagram page')
+        return driver
+    email = ''
+    pwd = ''
+    with open(os.path.join(settings.BASE_DIR, 'secrets.json')) as secrets_file:
+        data = json.load(secrets_file)
+        email = data['s1']
+        pwd = data['s2']
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="loginForm"]/div/div[1]/div/label/input'))).send_keys(email)
+    except:
+        print('can not locate username')
+        return driver
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="loginForm"]/div/div[2]/div/label/input'))).send_keys(pwd)
+    except:
+        print('can not locate pwd')
+        return driver
+    try:
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="loginForm"]/div/div[3]'))).click()
+    except:
+        print('can not locate submit')
+        return driver
+    try:
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "Not Now")]'))).click() 
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "Not Now")]'))).click()  #search for a text="Not Now"
+    except:
+        pass
+
+    time.sleep(2)
+
+    actualTitle = driver.title
+    currentUrl = driver.current_url
+    print('Login instagram Done -> ', actualTitle, currentUrl)
+    
+    return driver
 
 def login_facebook(driver):
     print('Try Login fb')
@@ -69,6 +118,7 @@ def login_facebook(driver):
         emailView.send_keys(email)
         pwdView.send_keys(pwd)
         submitView.click()
+        time.sleep(2)
         actualTitle = driver.title
         currentUrl = driver.current_url
         print('Login fb success -> ', actualTitle, currentUrl)
@@ -83,6 +133,11 @@ def read_followers(driver, supplier):
         pass
     else:
         url = 'https://' + url
+    try:
+        p = urlparse(url)
+        url = str(p.scheme) + "://" + p.netloc + p.path.removesuffix('/')
+    except:
+        pass
 
     channel = supplier.channel
     print('url-channel', url, channel)
@@ -336,10 +391,9 @@ def findFollowerElementOfTiktok(driver):
         pass
     return None
 
-def findFollowerElementOfInstagram(driver):
+def findFollowerElementOfInstagram(driver):    
     try:
-        time.sleep(3)
-        element = driver.find_element(By.XPATH, "//*[contains(text(),' followers')]")
+        element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),' followers')]")))
         return element
     except Exception as e:
         print('findFollowerElementOfInstagram err', str(e))
