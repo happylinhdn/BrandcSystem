@@ -133,11 +133,6 @@ def read_followers(driver, supplier):
         pass
     else:
         url = 'https://' + url
-    try:
-        p = urlparse(url)
-        url = str(p.scheme) + "://" + p.netloc + p.path.removesuffix('/')
-    except:
-        pass
 
     channel = supplier.channel
     print('url-channel', url, channel)

@@ -23,15 +23,21 @@ class Command(BaseCommand):
         if options['all']:
             sync_thread.sync_follower()
         elif options['ids']:
+            shouldSetupFb = False
+            shouldSetupInstagram = False
             suppliers = []
             for supplier_id in options['ids']:
                 try:
                     supplier = Supplier.objects.get(pk=supplier_id)
+                    shouldSetupFb = shouldSetupFb or supplier.channel == SupplierChannel.FB_PERSONAL
+                    shouldSetupInstagram = shouldSetupInstagram or supplier.channel == SupplierChannel.INSTAGRAM
                     suppliers.append(supplier)
                 except Supplier.DoesNotExist:
                     raise CommandError('Supplier "%s" does not exist' % supplier_id)
-            sync_thread.sync_suppliers(suppliers)
+            sync_thread.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
         elif options['range']:
+            shouldSetupFb = False
+            shouldSetupInstagram = False
             suppliers = []
             if len(options['range']) < 2:
                 raise CommandError('Provide range with from to')
@@ -41,10 +47,12 @@ class Command(BaseCommand):
             for supplier_id in range(_from, _to, 1):
                 try:
                     supplier = Supplier.objects.get(pk=supplier_id)
+                    shouldSetupFb = shouldSetupFb or supplier.channel == SupplierChannel.FB_PERSONAL
+                    shouldSetupInstagram = shouldSetupInstagram or supplier.channel == SupplierChannel.INSTAGRAM
                     suppliers.append(supplier)
                 except Supplier.DoesNotExist:
                     raise CommandError('Supplier "%s" does not exist' % supplier_id)
-            sync_thread.sync_suppliers(suppliers)
+            sync_thread.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
 
 
         self.stdout.write(self.style.SUCCESS('Sync End'))

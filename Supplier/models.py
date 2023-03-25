@@ -28,41 +28,42 @@ class Supplier(models.Model):
         validators=[
             MaxValueValidator(2030),
             MinValueValidator(1900)
-        ])
+        ],
+        blank=True
+        )
     gender = models.CharField(max_length=10, choices=Gender.choices, null=True)
     
     industries = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
     #ORIGINAL COST
-    original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True)
-    original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True)
-    original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True)
-    original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True)
+    original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True, blank=True)
+    original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
     kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
 
     #DISCOUNT, SUPPLIER NAME
-    discount = models.CharField(max_length=150, null=True)
-    supplier_name = models.CharField(max_length=200, null=True)
+    discount = models.CharField(max_length=150, null=True, blank=True)
+    supplier_name = models.CharField(max_length=200, null=True, blank=True)
 
     #BOOKING CONTACT: Name, Phone, Email
-    booking_contact_name = models.CharField(max_length=200, null=True)
-    booking_contact_phone = models.CharField(max_length=200, null=True)
-    booking_contact_email = models.CharField(max_length=200, null=True)
+    booking_contact_name = models.CharField(max_length=200, null=True, blank=True)
+    booking_contact_phone = models.CharField(max_length=200, null=True, blank=True)
+    booking_contact_email = models.CharField(max_length=200, null=True, blank=True)
 
-    #profile = models.FileField(verbose_name='PROFILE/QUOTATION', upload_to="profile", null=True, blank=True)
-    profile = models.CharField(verbose_name='Profile/Quotation', max_length=300, null=True)
+    profile = models.CharField(verbose_name='Profile/Quotation', max_length=300, null=True, blank=True)
 
-    latest_update = models.DateTimeField(null=True)
+    latest_update = models.DateTimeField(null=True, blank=True)
     #HANDLE BY
-    handle_by = models.CharField(max_length=100, null=True)
+    handle_by = models.CharField(max_length=100, null=True, blank=True)
     #GROUP CHAT NAME
-    group_chat_name = models.CharField(max_length=100, null=True)
+    group_chat_name = models.CharField(max_length=100, null=True, blank=True)
     #Kênh (Zalo, Viber or Facebook) 
-    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, null=True)
+    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, null=True, blank=True)
     #Set Leader Mode to Ms. Lana
     lana_leader = models.BooleanField(default = False, null=True)
     #History
     history = models.DateTimeField(auto_now_add=True, null=True)
-    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, blank=True)
 
 
     def kol_tier_detect(self):

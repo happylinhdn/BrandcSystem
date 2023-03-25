@@ -25,7 +25,7 @@ class SyncUtility:
         return should_sync
 
     def sync_follower(self, start_page = 0):
-        logObj = self.saveLog(None, 'sync_follower START,', True)
+        logObj = self.saveLog(None, 'START,', True)
         failDatas = []
         should_sync = self.should_sync()
         if should_sync == False:
@@ -38,28 +38,29 @@ class SyncUtility:
         for p in range(pages):
             if p >= start_page:
                 self.sync_page(p)
-        logObj = self.saveLog(logObj, 'sync_follower END, ', True)
+        logObj = self.saveLog(logObj, 'END, ', True)
         if len(failDatas) > 0:
             self.sync_follower_recheck(failDatas)
 
     def sync_page(self, page, pSize = 500):
-        logObj = self.saveLog(None, 'sync_page (%s, %s) START,'%(page, pSize), True)
+        logObj = self.saveLog(None, 'Page (%s, %s) START,'%(page, pSize), True)
         maxId = (page + 1) * pSize
         minId = page * pSize
         allSuppliers = Supplier.objects.filter(id__lte=maxId).filter(id__gte=minId).order_by('id')
-        self.sync_suppliers(allSuppliers)
-        temp_log = 'sync_page (%s, %s) End,'%(page, pSize)
+        shouldSetupFb = allSuppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0
+        shouldSetupInstagram = allSuppliers.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
+        self.sync_suppliers(allSuppliers, shouldSetupFb, shouldSetupInstagram)
+        temp_log = 'Page (%s, %s) End,'%(page, pSize)
         logObj = self.saveLog(logObj, temp_log, True)
 
-    def sync_suppliers(self, suppliers):
+    def sync_suppliers(self, suppliers, shouldSetupFb = True, shouldSetupInstagram = True):
         failDatas = []
         logObj = None
-        logSuccess = None
         logFail = None
         driver = None
         logObj = self.saveLog(None, 'sync_suppliers START,', True)
         try:
-            driver = prepare_driver(True, True)
+            driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
         except:
             logObj = self.saveLog(logObj, 'Init driver fail,', True)
             return
@@ -76,16 +77,9 @@ class SyncUtility:
                     if old_follower != new_follwer:
                         try:
                             obj.save()
-                            #temp_log = (obj.name + '(%s -> %s),' % (str(old_follower or ''), str(obj.follower or '')))
-                            #logSuccess = self.saveLog(logSuccess, temp_log, True)
                         except:
                             temp_log = obj.name + '(Save fail %s -> %s),' % (str(old_follower or ''), str(obj.follower or ''))
                             logFail = self.saveLog(logFail, temp_log, False)
-                    else:
-                        pass
-                        #temp_log = (obj.name + '(-),')
-                        #logSuccess = self.saveLog(logSuccess, temp_log, True)
-
                 else:
                     failDatas.append(obj)
                     temp_log = (obj.name + '(%s),' % (obj.id) )
@@ -99,9 +93,10 @@ class SyncUtility:
                 pass
 
         if len(failDatas) > 0:
-            pass
+            logObj = self.saveLog(logObj, 'sync_suppliers END with %s fail items' % len(failDatas), True)
             #self.sync_follower_recheck(failDatas)
-        logObj = self.saveLog(logObj, 'sync_suppliers END', True)
+        else:
+            logObj = self.saveLog(logObj, 'sync_suppliers END', True)
 
     def sync_follower_recheck(self, datas):
         logObj = self.saveLog(None, 'Recheck (%s) start,'%len(datas), True)
