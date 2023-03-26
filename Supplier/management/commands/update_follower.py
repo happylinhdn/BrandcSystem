@@ -68,14 +68,15 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Do sync log fails'))
 
         failLogs = BackgroundLog.objects.filter(isSuccess=False)
-        count = failLogs.count()
-        self.stdout.write(self.style.SUCCESS('Log fails = %s') % count)
+        #count = failLogs.count()
+        #self.stdout.write(self.style.SUCCESS('Log fails = %s') % count)
         ids = []
         for logObj in failLogs:
             ids += self.detectFailNumber(logObj.log)
         shouldSetupFb = False
         shouldSetupInstagram = False
         suppliers = []
+        self.stdout.write(self.style.SUCCESS('fails = %s') % len(ids))
         for id in ids:
             try:
                 supplier_id = id.removeprefix('(').removesuffix(')')
@@ -100,6 +101,7 @@ class Command(BaseCommand):
             raw = match.group()
             #print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = raw))
             outputs.append(raw)
-        return outputs  
+        myunique = set(outputs)
+        return myunique  
 
         
