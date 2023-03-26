@@ -47,8 +47,11 @@ class SyncUtility:
         maxId = (page + 1) * pSize
         minId = page * pSize
         allSuppliers = Supplier.objects.filter(id__lte=maxId).filter(id__gte=minId).order_by('id')
-        shouldSetupFb = allSuppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0
+        shouldSetupFb = allSuppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0 or \
+            allSuppliers.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 or \
+                allSuppliers.filter(channel=SupplierChannel.FB_GROUP).count() > 0
         shouldSetupInstagram = allSuppliers.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
+
         self.sync_suppliers(allSuppliers, shouldSetupFb, shouldSetupInstagram)
         temp_log = 'Page (%s, %s) End,'%(page, pSize)
         logObj = self.saveLog(logObj, temp_log, True)
@@ -58,7 +61,7 @@ class SyncUtility:
         logObj = None
         logFail = None
         driver = None
-        logObj = self.saveLog(None, 'sync_suppliers START,', True)
+        logObj = self.saveLog(None, 'sync_suppliers START', True)
         try:
             driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
         except:

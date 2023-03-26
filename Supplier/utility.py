@@ -27,6 +27,7 @@ def prepare_driver(shouldFbSetup = False, shouldInstagramSetup = False):
 
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver.set_window_size(1920, 1080)
     if shouldInstagramSetup:
         driver = login_instagram(driver)
 
@@ -259,6 +260,14 @@ def findFbGeneralElement(driver):
             return element
     except Exception as e:
         print('Can not find Thành viên')
+    
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'thành viên')]")
+        if element and element.text:
+            print('found fb thanhVien tag')
+            return element
+    except Exception as e:
+        print('Can not find thành viên')
 
     return None
 
@@ -329,6 +338,15 @@ def findFbFanPageElement(driver, url):
             return element
     except:
         pass
+
+    try:
+        element = driver.find_element(By.XPATH, "//*[contains(text(),'thành viên')]")
+        if element and element.text:
+            print('found fb thanhVien tag')
+            return element
+    except:
+        pass
+
 
     return None
 
