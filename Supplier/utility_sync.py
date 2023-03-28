@@ -9,23 +9,25 @@ from django.utils import timezone
 class SyncUtility:
 
     def sync_channels(self):
-        logObj = self.saveLog(None, 'START,', True)
+        logObj = self.saveLog(None, 'START, ', True)
         should_sync = self.should_sync()
         if should_sync == False:
-            logObj = self.saveLog(logObj, 'Stop by config,', True)
+            logObj = self.saveLog(logObj, 'Stop by config, ', True)
             return
         for channel in SupplierChannel.choices:
-            self.sync_channel(channel[0])
-            pass
+            if support_sync(channel[0]):
+                self.sync_channel(channel[0])
+            else:
+                logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s' % channel[0], True)
 
     def sync_channel(self, channel):
-        suppliers = Supplier.objects.filter(channel=channel)
+        suppliers = Supplier.objects.filter(channel=channel).order_by('id')
         count = suppliers.count()
         shouldSetupFb = suppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0 \
             or suppliers.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 \
                 or suppliers.filter(channel=SupplierChannel.FB_GROUP).count() > 0
         shouldSetupInstagram = suppliers.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
-        logObj = self.saveLog(None, 'sync_channel %s with %s item START'%(channel, count), True)
+        logObj = self.saveLog(None, 'sync_channel %s with %s item START '%(channel, count), True)
         if count > 0:
             self.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
         logObj = self.saveLog(logObj, 'sync_channel %s END'%channel, True)
@@ -49,22 +51,22 @@ class SyncUtility:
         return should_sync
 
     def sync_follower(self, start_page = 0):
-        logObj = self.saveLog(None, 'START,', True)
+        logObj = self.saveLog(None, 'START, ', True)
         should_sync = self.should_sync()
         if should_sync == False:
-            logObj = self.saveLog(logObj, 'Stop by config,', True)
+            logObj = self.saveLog(logObj, 'Stop by config, ', True)
             return
 
         count = Supplier.objects.count()
         pages = int(count/500) + 1
-        logObj = self.saveLog(logObj, 'split to %s pages'%pages, True)
+        logObj = self.saveLog(logObj, 'split to %s pages '%pages, True)
         for p in range(pages):
             if p >= start_page:
                 self.sync_page(p)
         logObj = self.saveLog(logObj, 'END, ', True)
 
     def sync_page(self, page, pSize = 500):
-        logObj = self.saveLog(None, 'Page (%s, %s) START,'%(page, pSize), True)
+        logObj = self.saveLog(None, 'Page (%s, %s) START, '%(page, pSize), True)
         maxId = (page + 1) * pSize
         minId = page * pSize
         allSuppliers = Supplier.objects.filter(id__lte=maxId).filter(id__gte=minId).order_by('id')
@@ -82,11 +84,11 @@ class SyncUtility:
         logObj = None
         logFail = None
         driver = None
-        logObj = self.saveLog(None, 'sync_suppliers START', True)
+        logObj = self.saveLog(None, 'sync_suppliers START ', True)
         try:
             driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
         except:
-            logObj = self.saveLog(logObj, 'Init driver fail,', True)
+            logObj = self.saveLog(logObj, 'Init driver fail, ', True)
             return
 
         for obj in suppliers:

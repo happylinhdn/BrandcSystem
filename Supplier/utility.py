@@ -234,32 +234,56 @@ def findFbGeneralElement(driver):
                 link = a.get_attribute('href')
                 if link and 'followers' in link:
                     element = a
-                    return element
+                    if read_element(element):
+                        print('Found followers href')
+                        return element
             except Exception as e:
-                print('Can not read')
+                pass
     except Exception as e:
         print('Can not read followers')
+
     try:
-        element = driver.find_element(By.XPATH, "//*[contains(text(),'people follow this')]")
-        if element:
-            return element
+        elements = driver.find_elements(By.XPATH, '//a[contains(@href, "%s")]' % 'members')
+        for a in elements:
+            try:
+                link = a.get_attribute('href')
+                if link and 'members' in link:
+                    element = a
+                    if element and read_element(element):
+                        print('Found members href')
+                        return element
+            except Exception as e:
+                pass
+    except Exception as e:
+        print('Can not find members href')
+
+    try:
+        elements = driver.find_elements(By.XPATH, "//*[contains(text(),'people follow this')]")
+        for element in elements:
+            if element and read_element(element):
+                print('Found people follow this')
+                return element
     except Exception as e:
         print('Can not find people follow this')
 
     try:
-        element = driver.find_element(By.XPATH, "//*[contains(text(),'người theo dõi')]")
-        if element:
-            return element
+        elements = driver.find_elements(By.XPATH, "//*[contains(text(),'người theo dõi')]")
+        for element in elements:
+            if element and read_element(element):
+                print('Found người theo dõi')
+                return element
     except Exception as e:
         print('Can not find người theo dõi')
-    
+
+
     try:
-        element = driver.find_element(By.XPATH, "//*[contains(text(),'members')]")
-        if element and element.text:
-            print('found fb members tag')
-            return element
+        elements = driver.find_elements(By.XPATH, "//*[contains(text(),'members')]")
+        for element in elements:
+            if element and read_element(element):
+                print('Found members text')
+                return element
     except Exception as e:
-        print('Can not find members')
+        print('Can not find members text')
 
     try:
         element = driver.find_element(By.XPATH, "//*[contains(text(),'Thành viên')]")
