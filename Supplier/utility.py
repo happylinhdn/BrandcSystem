@@ -178,6 +178,14 @@ def read_followers(driver, supplier):
         element = findFollowerElementOfInstagram(driver)
         if element:
             followers = read_element(element)
+    elif channel == SupplierChannel.YOUTUBE_PERSONAL:
+        element = findFollowerElementOfYoutubePersonal(driver)
+        if element:
+            followers = read_element(element)
+    elif channel == SupplierChannel.YOUTUBE_COMMUNITY:
+        element = findFollowerElementOfYoutubePersonal(driver)
+        if element:
+            followers = read_element(element)
     
     if followers == None and isFbChannel(channel):
         if isFbLinkNotValid(driver):
@@ -412,6 +420,33 @@ def findFollowerElementOfInstagram(driver):
         print('findFollowerElementOfInstagram err', str(e))
         pass
     return None
+
+def findFollowerElementOfYoutubePersonal(driver):    
+    try:
+        element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "/html/body/ytd-app/div[1]/ytd-page-manager/ytd-browse/div[3]/ytd-c4-tabbed-header-renderer/tp-yt-app-header-layout/div/tp-yt-app-header/div[2]/div[2]/div/div[1]/div/div[1]/yt-formatted-string[2]")))
+        return element
+    except Exception as e:
+        print('path 1 err', str(e))
+        pass
+
+    try:
+        element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "/html/body/ytm-app/div[1]/ytm-watch/div[2]/ytm-single-column-watch-next-results-renderer/ytm-slim-video-metadata-section-renderer/ytm-slim-owner-renderer/a/div/div/span")))
+        return element
+    except Exception as e:
+        print('path 1 err', str(e))
+        pass
+    
+    # try:
+    #     element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'subscribers')]")))
+    #     return element
+    # except Exception as e:
+    #     print('findFollowerElementOfYoutubePersonal err', str(e))
+    #     pass
+
+    return None
+
+    
+
 
 def read_element(element):
     if element:

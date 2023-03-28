@@ -1,4 +1,5 @@
 from Supplier.models import Supplier
+from Supplier.supportmodels import SupplierChannel
 from siteconfig.models import BackgroundLog, SyncConfig
 import datetime
 from Supplier.utility import *
@@ -6,6 +7,29 @@ from Supplier.utility_numbers import *
 from django.utils import timezone
 
 class SyncUtility:
+
+    def sync_channels(self):
+        logObj = self.saveLog(None, 'START,', True)
+        should_sync = self.should_sync()
+        if should_sync == False:
+            logObj = self.saveLog(logObj, 'Stop by config,', True)
+            return
+        for channel in SupplierChannel.choices:
+            self.sync_channel(channel[0])
+            pass
+
+    def sync_channel(self, channel):
+        suppliers = Supplier.objects.filter(channel=channel)
+        count = suppliers.count()
+        shouldSetupFb = suppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0 \
+            or suppliers.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 \
+                or suppliers.filter(channel=SupplierChannel.FB_GROUP).count() > 0
+        shouldSetupInstagram = suppliers.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
+        logObj = self.saveLog(None, 'sync_channel %s with %s item START'%(channel, count), True)
+        if count > 0:
+            self.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
+        logObj = self.saveLog(logObj, 'sync_channel %s END'%channel, True)
+
     def should_sync(self):
         should_sync = True
         x_date = datetime.date.today()
@@ -26,7 +50,6 @@ class SyncUtility:
 
     def sync_follower(self, start_page = 0):
         logObj = self.saveLog(None, 'START,', True)
-        failDatas = []
         should_sync = self.should_sync()
         if should_sync == False:
             logObj = self.saveLog(logObj, 'Stop by config,', True)
@@ -39,8 +62,6 @@ class SyncUtility:
             if p >= start_page:
                 self.sync_page(p)
         logObj = self.saveLog(logObj, 'END, ', True)
-        if len(failDatas) > 0:
-            self.sync_follower_recheck(failDatas)
 
     def sync_page(self, page, pSize = 500):
         logObj = self.saveLog(None, 'Page (%s, %s) START,'%(page, pSize), True)

@@ -120,7 +120,9 @@ class ExportCsvMixin:
             messages.error(request, "Can't sync more than %s Records in one go." % str(limit))
             return HttpResponseRedirect(request.path_info)
         
-        shouldSetupFb = queryset.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0
+        shouldSetupFb = queryset.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0 \
+            or queryset.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 \
+                or queryset.filter(channel=SupplierChannel.FB_GROUP).count() > 0
         shouldSetupInstagram = queryset.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
         
         driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)

@@ -20,13 +20,19 @@ class Command(BaseCommand):
         )
         parser.add_argument('--range', nargs='+', type=int)
         parser.add_argument('--logs')
+        parser.add_argument('--channel')
+        parser.add_argument('--check_hl')
 
 
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('call update_follower command success, checking arg'))
         sync_thread = SyncUtility()
-        if options['logs']:
+        if options['channel']:
+            self.sync_by_channel(options['channel'])
+        elif options['check_hl']:
+            self.check_hl()
+        elif options['logs']:
             self.show_logs_fail()
         elif options['all']:
             sync_thread.sync_follower()
@@ -90,8 +96,6 @@ class Command(BaseCommand):
         sync_thread = SyncUtility()
         sync_thread.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
         
-
-
     def detectFailNumber(self, text):
         outputs = []
         regex = r"\([+-]?\d+?\)"
@@ -104,4 +108,17 @@ class Command(BaseCommand):
         myunique = set(outputs)
         return myunique  
 
+    def sync_by_channel(self, channel):
+        print('sync_by_channel', channel)
+        sync_thread = SyncUtility()
+        sync_thread.sync_channel(channel)
         
+    def check_hl(self):
+        suppliers = Supplier.objects.filter(link__contains='hl=')
+        count = suppliers.count()
+        print('check_hl', count)
+        for sup in suppliers:
+            print(sup.id, sup.name, sup.link)
+        
+        for channel in SupplierChannel.choices:
+            print('channel', channel[0])
