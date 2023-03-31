@@ -38,6 +38,7 @@ def convert_to_float(follower_input):
     else:
         try:
             upperFollower = upperFollower.replace('.','') #todo: consider In VN 1.000 -> 1000
+            upperFollower = upperFollower.replace(',','') #todo: consider In VN 1,000 -> 1000
             value = float(upperFollower)
         except:
             try:
