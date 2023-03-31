@@ -15,3 +15,8 @@ class BackgroundLog(models.Model):
     log = models.TextField(null=True)
     time = models.DateTimeField(auto_now_add=True, null=True)
     isSuccess = models.BooleanField(default = True, null=True)
+
+class BackgroundLogDevOnly(models.Model):
+    log = models.TextField(null=True)
+    time = models.DateTimeField(auto_now_add=True, null=True)
+    isSuccess = models.BooleanField(default = True, null=True)

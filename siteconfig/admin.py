@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BackgroundLog, SyncConfig
+from .models import BackgroundLog, SyncConfig, BackgroundLogDevOnly
 
 # Register your models here.
 @admin.register(SyncConfig)
@@ -18,6 +18,13 @@ class SyncConfigAdmin(admin.ModelAdmin):
 
 @admin.register(BackgroundLog)
 class BackgroundLogAdmin(admin.ModelAdmin):
+    readonly_fields=('time', 'log', 'isSuccess')
+    list_display = ['id', 'isSuccess','log','time']
+    search_fields = ['log']
+    list_filter = ['isSuccess']
+
+@admin.register(BackgroundLogDevOnly)
+class BBackgroundLogDevOnlyAdmin(admin.ModelAdmin):
     readonly_fields=('time', 'log', 'isSuccess')
     list_display = ['id', 'isSuccess','log','time']
     search_fields = ['log']

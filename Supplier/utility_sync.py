@@ -1,12 +1,19 @@
 from Supplier.models import Supplier
 from Supplier.supportmodels import SupplierChannel
-from siteconfig.models import BackgroundLog, SyncConfig
+from siteconfig.models import BackgroundLog, SyncConfig, BackgroundLogDevOnly
 import datetime
 from Supplier.utility import *
 from Supplier.utility_numbers import *
 from django.utils import timezone
 
 class SyncUtility:
+    def __new__(cls, *args, **kwargs):
+        print("1. Create a new instance of SyncUtility.")
+        return super().__new__(cls)
+
+    def __init__(self, forDev):
+        print("2. Initialize the new instance of SyncUtility.")
+        self.forDev = forDev
 
     def sync_channels(self):
         logObj = self.saveLog(None, 'START, ', True)
@@ -18,7 +25,7 @@ class SyncUtility:
             if support_sync(channel[0]):
                 self.sync_channel(channel[0])
             else:
-                logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s' % channel[0], True)
+                logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
 
     def sync_channel(self, channel):
         suppliers = Supplier.objects.filter(channel=channel).order_by('id')
@@ -27,10 +34,10 @@ class SyncUtility:
             or suppliers.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 \
                 or suppliers.filter(channel=SupplierChannel.FB_GROUP).count() > 0
         shouldSetupInstagram = suppliers.filter(channel=SupplierChannel.INSTAGRAM).count() > 0
-        logObj = self.saveLog(None, 'sync_channel %s with %s item START '%(channel, count), True)
+        self.saveLog(None, 'sync_channel %s with %s item START '%(channel, count), True)
         if count > 0:
             self.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
-        logObj = self.saveLog(logObj, 'sync_channel %s END'%channel, True)
+        self.saveLog(None, 'sync_channel %s END'%channel, True)
 
     def should_sync(self):
         should_sync = True
@@ -127,7 +134,6 @@ class SyncUtility:
     def sync_follower_recheck(self, datas):
         logObj = self.saveLog(None, 'Recheck (%s) start,'%len(datas), True)
         driver = None
-        logSuccess = None
         logFail = None
         try:
             driver = prepare_driver(True, True)
@@ -177,7 +183,7 @@ class SyncUtility:
         print('write log:', textLog)
         logInstance = logObj
         if logInstance == None:
-            logInstance = BackgroundLog(log = textLog, isSuccess = isSuccess)
+            logInstance = self.getLog(textLog, isSuccess)
         else:
             logInstance.log = logInstance.log + textLog
             logInstance.time = timezone.now()
@@ -186,6 +192,12 @@ class SyncUtility:
     
         if len(logInstance.log) > 10000:
             textLog = ''
-            logInstance = BackgroundLog(log = textLog, isSuccess = isSuccess)
+            logInstance = self.getLog(textLog, isSuccess)
     
         return logInstance
+    
+    def getLog(self, textLog, isSuccess):
+        if self.forDev:
+            return BackgroundLogDevOnly(log = textLog, isSuccess = isSuccess)
+        else:
+            return BackgroundLog(log = textLog, isSuccess = isSuccess)

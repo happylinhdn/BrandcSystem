@@ -3,7 +3,7 @@ from Supplier.models import Supplier
 from Supplier.supportmodels import isFbChannel
 from Supplier.utility import *
 from Supplier.utility_numbers import *
-from siteconfig.models import BackgroundLog
+from siteconfig.models import BackgroundLog, BackgroundLogDevOnly
 from Supplier.utility_sync import SyncUtility
 import re
 
@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('call update_follower command success, checking arg'))
-        sync_thread = SyncUtility()
+        sync_thread = SyncUtility(True)
         if options['channel']:
             self.sync_by_channel(options['channel'])
         elif options['check_hl']:
@@ -73,7 +73,7 @@ class Command(BaseCommand):
     def show_logs_fail(self):
         self.stdout.write(self.style.SUCCESS('Do sync log fails'))
 
-        failLogs = BackgroundLog.objects.filter(isSuccess=False)
+        failLogs = BackgroundLogDevOnly.objects.filter(isSuccess=False)
         #count = failLogs.count()
         #self.stdout.write(self.style.SUCCESS('Log fails = %s') % count)
         ids = []
@@ -93,7 +93,7 @@ class Command(BaseCommand):
             except Supplier.DoesNotExist:
                 print('Supplier "%s" does not exist' % id)
         
-        sync_thread = SyncUtility()
+        sync_thread = SyncUtility(True)
         sync_thread.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
         
     def detectFailNumber(self, text):
@@ -110,7 +110,7 @@ class Command(BaseCommand):
 
     def sync_by_channel(self, channel):
         print('sync_by_channel', channel)
-        sync_thread = SyncUtility()
+        sync_thread = SyncUtility(True)
         sync_thread.sync_channel(channel)
         
     def check_hl(self):
