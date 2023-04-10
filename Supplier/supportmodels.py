@@ -155,7 +155,7 @@ class Location(models.TextChoices):
     HB='Hòa Bình', _('Hòa Bình')
     SG='Hồ Chí Minh', _('Thành phố Hồ Chí Minh')
     HY='Hưng Yên', _('Hưng Yên')
-    KH='Khánh Hoà', _('Khánh Hoà')
+    KH='Khánh Hòa', _('Khánh Hòa')
     KG='Kiên Giang', _('Kiên Giang')
     KT='Kon Tum', _('Kon Tum')
     LC='Lai Châu', _('Lai Châu')

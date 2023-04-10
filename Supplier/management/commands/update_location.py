@@ -5,11 +5,15 @@ class Command(BaseCommand):
     help = 'Correct location'
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS('call update_follower command success, checking arg'))
+        self.stdout.write(self.style.SUCCESS('call correct location'))
         count = Supplier.objects.count()
         self.stdout.write(self.style.SUCCESS('Successfully Read All Supplier "%s"' % count))
-        GeneralCount = Supplier.objects.filter(location='General').count()
-        self.stdout.write(self.style.SUCCESS('Successfully Read All GeneralLocation Supplier "%s"' % GeneralCount))
-        Supplier.objects.filter(location='General').update(location='Toàn Quốc')
-        emptyLocation = Supplier.objects.filter(location=None).count()
-        self.stdout.write(self.style.SUCCESS('Successfully Read All EmptyLocation Supplier "%s"' % emptyLocation))
+        KhanhHoaCount1 = Supplier.objects.filter(location='Khánh Hoà').count()
+        KhanhHoaCount2 = Supplier.objects.filter(location='Khánh Hòa').count()
+        self.stdout.write(self.style.SUCCESS('Successfully Read All KhanhHoaCount1 Supplier "%s"' % KhanhHoaCount1))
+        self.stdout.write(self.style.SUCCESS('Successfully Read All KhanhHoaCount2 Supplier "%s"' % KhanhHoaCount2))
+        Supplier.objects.filter(location='Khánh Hoà').update(location='Khánh Hòa')
+        KhanhHoaCount1 = Supplier.objects.filter(location='Khánh Hoà').count()
+        KhanhHoaCount2 = Supplier.objects.filter(location='Khánh Hòa').count()
+        self.stdout.write(self.style.SUCCESS('Update after KhanhHoaCount1 Supplier "%s"' % KhanhHoaCount1))
+        self.stdout.write(self.style.SUCCESS('Update after KhanhHoaCount2 Supplier "%s"' % KhanhHoaCount2))
