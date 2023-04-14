@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from Supplier.models import Supplier
+from Supplier.models import SupplierModel
 from Supplier.supportmodels import isFbChannel
 from Supplier.utility import *
 from Supplier.utility_numbers import *
@@ -42,11 +42,11 @@ class Command(BaseCommand):
             suppliers = []
             for supplier_id in options['ids']:
                 try:
-                    supplier = Supplier.objects.get(pk=supplier_id)
+                    supplier = SupplierModel.objects.get(pk=supplier_id)
                     shouldSetupFb = shouldSetupFb or isFbChannel(supplier.channel)
                     shouldSetupInstagram = shouldSetupInstagram or supplier.channel == SupplierChannel.INSTAGRAM
                     suppliers.append(supplier)
-                except Supplier.DoesNotExist:
+                except SupplierModel.DoesNotExist:
                     raise CommandError('Supplier "%s" does not exist' % supplier_id)
             sync_thread.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
         elif options['range']:
@@ -60,11 +60,11 @@ class Command(BaseCommand):
             _to = options['range'][1]
             for supplier_id in range(_from, _to, 1):
                 try:
-                    supplier = Supplier.objects.get(pk=supplier_id)
+                    supplier = SupplierModel.objects.get(pk=supplier_id)
                     shouldSetupFb = shouldSetupFb or isFbChannel(supplier.channel)
                     shouldSetupInstagram = shouldSetupInstagram or supplier.channel == SupplierChannel.INSTAGRAM
                     suppliers.append(supplier)
-                except Supplier.DoesNotExist:
+                except SupplierModel.DoesNotExist:
                     raise CommandError('Supplier "%s" does not exist' % supplier_id)
             sync_thread.sync_suppliers(suppliers, shouldSetupFb, shouldSetupInstagram)
 
@@ -86,11 +86,11 @@ class Command(BaseCommand):
         for id in ids:
             try:
                 supplier_id = id.removeprefix('(').removesuffix(')')
-                supplier = Supplier.objects.get(pk=supplier_id)
+                supplier = SupplierModel.objects.get(pk=supplier_id)
                 shouldSetupFb = shouldSetupFb or isFbChannel(supplier.channel)
                 shouldSetupInstagram = shouldSetupInstagram or supplier.channel == SupplierChannel.INSTAGRAM
                 suppliers.append(supplier)
-            except Supplier.DoesNotExist:
+            except SupplierModel.DoesNotExist:
                 print('Supplier "%s" does not exist' % id)
         
         sync_thread = SyncUtility(True)
@@ -114,7 +114,7 @@ class Command(BaseCommand):
         sync_thread.sync_channel(channel)
         
     def check_hl(self):
-        suppliers = Supplier.objects.filter(link__contains='hl=')
+        suppliers = SupplierModel.objects.filter(link__contains='hl=')
         count = suppliers.count()
         print('check_hl', count)
         for sup in suppliers:

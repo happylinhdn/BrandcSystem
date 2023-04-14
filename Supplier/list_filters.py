@@ -1,5 +1,5 @@
 from django.contrib.admin import SimpleListFilter
-from .models import Supplier
+from .models import SupplierModel
 from .supportmodels import *
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext as _
@@ -109,7 +109,7 @@ class IndustryFilter(SimpleListFilter):
             #     all_Other_fields.append(c)
             
             
-        t_data = [c.industries for c in Supplier.objects.all()]
+        t_data = [c.industries for c in SupplierModel.objects.all()]
         result = []
 
         result.append(MusicCategory)
@@ -309,7 +309,7 @@ class FieldsFilter(SimpleListFilter):
             else:
                 others_fields.append(c)
             
-        t_data = [c.industries for c in Supplier.objects.all()]
+        t_data = [c.industries for c in SupplierModel.objects.all()]
         result = []
 
         result.append(MusicCategory)

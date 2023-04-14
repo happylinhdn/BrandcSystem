@@ -1,4 +1,4 @@
-from Supplier.models import Supplier
+from Supplier.models import SupplierModel
 from Supplier.supportmodels import SupplierChannel
 from siteconfig.models import BackgroundLog, SyncConfig, BackgroundLogDevOnly
 import datetime
@@ -28,7 +28,7 @@ class SyncUtility:
                 logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
 
     def sync_channel(self, channel):
-        suppliers = Supplier.objects.filter(channel=channel).order_by('id')
+        suppliers = SupplierModel.objects.filter(channel=channel).order_by('id')
         count = suppliers.count()
         shouldSetupFb = suppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0 \
             or suppliers.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 \
@@ -64,7 +64,7 @@ class SyncUtility:
             logObj = self.saveLog(logObj, 'Stop by config, ', True)
             return
 
-        count = Supplier.objects.count()
+        count = SupplierModel.objects.count()
         pages = int(count/500) + 1
         logObj = self.saveLog(logObj, 'split to %s pages '%pages, True)
         for p in range(pages):
@@ -76,7 +76,7 @@ class SyncUtility:
         logObj = self.saveLog(None, 'Page (%s, %s) START, '%(page, pSize), True)
         maxId = (page + 1) * pSize
         minId = page * pSize
-        allSuppliers = Supplier.objects.filter(id__lte=maxId).filter(id__gte=minId).order_by('id')
+        allSuppliers = SupplierModel.objects.filter(id__lte=maxId).filter(id__gte=minId).order_by('id')
         shouldSetupFb = allSuppliers.filter(channel=SupplierChannel.FB_PERSONAL).count() > 0 or \
             allSuppliers.filter(channel=SupplierChannel.FB_FANPAGE).count() > 0 or \
                 allSuppliers.filter(channel=SupplierChannel.FB_GROUP).count() > 0

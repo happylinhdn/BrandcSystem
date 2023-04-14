@@ -10,7 +10,7 @@ from Supplier.utility import *
 from Supplier.utility_numbers import *
 
 
-class Supplier(models.Model):
+class SupplierModel(models.Model):
     #no = models.IntegerField() # todo: auto increase
     name = models.CharField(max_length=100, null=True)
     link = models.CharField(max_length=300, null=True)
@@ -106,7 +106,7 @@ class Supplier(models.Model):
 
     def save(self, *args, **kwargs):
         self.valid_form()
-        super(Supplier, self).save(*args, **kwargs)
+        super(SupplierModel, self).save(*args, **kwargs)
     
     def valid_form(self):
         self.follower_2 = convert_to_float(str(self.follower) or '0')
@@ -207,6 +207,8 @@ class Supplier(models.Model):
             ("export_excel_1000_admin", "Can export excel as an admin role"),
             ("sync_follower", "Can sync follower (max 4 items)")
         ]
+        verbose_name = "Supplier"
+        verbose_name_plural = "Suppliers"
 
 class ExcelFile(models.Model):
     file = models.FileField(upload_to="excel")

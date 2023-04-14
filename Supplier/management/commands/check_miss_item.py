@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from Supplier.models import Supplier
+from Supplier.models import SupplierModel
 
 class Command(BaseCommand):
     help = 'Check miss item'
@@ -8,7 +8,7 @@ class Command(BaseCommand):
         
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('call Check miss item'))
-        count = Supplier.objects.count()
+        count = SupplierModel.objects.count()
         self.stdout.write(self.style.SUCCESS('All Supplier is "%s"' % count))
         max_id = count
         if options['max_id']:
@@ -18,8 +18,8 @@ class Command(BaseCommand):
         log = ''
         for id in range(1, max_id, 1):
             try:
-                supplier = Supplier.objects.get(pk=id)
-            except Supplier.DoesNotExist:
+                supplier = SupplierModel.objects.get(pk=id)
+            except SupplierModel.DoesNotExist:
                 countMiss = countMiss + 1
                 log += "%d, " % id
         if countMiss > 0:

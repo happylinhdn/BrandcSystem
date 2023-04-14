@@ -22,11 +22,3 @@ class BackgroundLogAdmin(admin.ModelAdmin):
     list_display = ['id', 'isSuccess','log','time']
     search_fields = ['log']
     list_filter = ['isSuccess']
-
-@admin.register(BackgroundLogDevOnly)
-class BBackgroundLogDevOnlyAdmin(admin.ModelAdmin):
-    readonly_fields=('time', 'log', 'isSuccess')
-    list_display = ['id', 'isSuccess','log','time']
-    search_fields = ['log']
-    list_filter = ['isSuccess']
-    

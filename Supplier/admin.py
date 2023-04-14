@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.utils.translation import gettext as _
-from .models import Supplier, DummyModel
+from .models import SupplierModel, DummyModel
 from .list_filters import IndustryFilter, CostRangeFilter, YearRangeFilter
 from .forms import SupplierForm
 from .actions import ExportCsvMixin
@@ -34,7 +34,7 @@ class CustomPaginator(Paginator):
             return len(self.object_list)
 
 # Register your models here.
-@admin.register(Supplier)
+@admin.register(SupplierModel)
 class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     class Media:
         css = {
@@ -48,7 +48,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         page = self.PAGE_INDEX or 1
         min = (int(page) - 1) * self.list_per_page + 1
         max = int(page) * self.list_per_page
-        count = Supplier.objects.count()
+        count = SupplierModel.objects.count()
         print('index_counter', page, min, max, count)
         if self.indexCnt < min:
             self.indexCnt = min - 1
@@ -136,39 +136,3 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     #     self.PAGE_INDEX = p
         
     #     return queryset, duplicate
-
-@admin.register(DummyModel)
-class DummyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
-    'location', 'year_display', 'gender', 'industries', 'original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc',
-    'kpi', 'discount', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
-    'group_chat_channel', 'lana_leader' , 'modified_by'
-    ]
-    list_display_links  = ['name',]
-    
-    list_per_page = 250
-    ordering = ['id']
-
-    
-    def booking_contact(self, obj):
-        return """Name:{0} - Phone: {1} - Email:{2}""".format(obj.booking_contact_name or '-', obj.booking_contact_phone or '-', obj.booking_contact_email or '-')
-    
-    def profile_display(self, obj):
-        if obj.profile and is_string_an_url(obj.profile):
-            return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=obj.profile, name='Link')
-        return "-"
-    profile_display.short_description = 'PROFILE/QUOTATION'
-
-    def year_display(self, obj):
-        if obj.year_of_birth:
-            return "{0}".format(obj.year_of_birth)
-        return "-"
-    year_display.short_description = 'Year'
-
-    def channel_display(self, obj):
-        return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=obj.link, name=obj.channel)
-    channel_display.short_description = 'Channel'
-
-    def engagement_rate_absolute_display(self, obj):
-        return obj.engagement_rate_absolute_display_calc() 
-    engagement_rate_absolute_display.short_description = 'ER (Ab.)'

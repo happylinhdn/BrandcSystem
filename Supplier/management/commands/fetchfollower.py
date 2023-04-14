@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from Supplier.models import Supplier
+from Supplier.models import SupplierModel
 
 class Command(BaseCommand):
     help = 'Fetch all suppliers'
@@ -16,14 +16,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('call fetchFollower command success, checking arg'))
         if options['all']:
-            count = Supplier.objects.count()
+            count = SupplierModel.objects.count()
             self.stdout.write(self.style.SUCCESS('Successfully Read All Supplier "%s"' % count))
             return
         if options['ids']:
             for supplier_id in options['ids']:
                 try:
-                    supplier = Supplier.objects.get(pk=supplier_id)
-                except Supplier.DoesNotExist:
+                    supplier = SupplierModel.objects.get(pk=supplier_id)
+                except SupplierModel.DoesNotExist:
                     raise CommandError('Supplier "%s" does not exist' % supplier_id)
 
                 # poll.opened = False

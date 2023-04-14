@@ -1,6 +1,6 @@
 from ast import IsNot
 from django.shortcuts import render
-from .models import Supplier, ExcelFile
+from .models import SupplierModel, ExcelFile
 import pandas as pd
 from django.http import JsonResponse 
 from django.conf import settings
@@ -9,7 +9,7 @@ from datetime import datetime
 # Create your views here.
 
 def export_supplier_to_excel(request):
-    objs = Supplier.objects.all()
+    objs = SupplierModel.objects.all()
     data = []
     for obj in objs:
         data.append(obj.parse_to_json())
@@ -29,10 +29,10 @@ def import_supplier(request):
         for d in df.values:
             id = d[0]
             try:
-                supplier = Supplier.objects.get(id=id)
+                supplier = SupplierModel.objects.get(id=id)
                 update_supplier(supplier, d)
             except:
-                supplier = Supplier()
+                supplier = SupplierModel()
                 update_supplier(supplier, d)
             
         return JsonResponse({'status': 200, 'msg':'Upload done'})

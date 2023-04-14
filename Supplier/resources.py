@@ -1,7 +1,7 @@
 from import_export import resources
-from .models import Supplier
+from .models import SupplierModel
 
 class SupplierResource(resources.ModelResource):
     class Meta:
-        model = Supplier
+        model = SupplierModel
         exclude = ('follower_2', )

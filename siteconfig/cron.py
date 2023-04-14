@@ -1,5 +1,5 @@
 from Supplier.utility_sync import SyncUtility
-from Supplier.models import Supplier
+from Supplier.models import SupplierModel
 from Supplier.supportmodels import SupplierChannel
 
 def sync_follower():
@@ -14,7 +14,7 @@ def sync_follower_ids():
     suppliers = []
     for supplier_id in ids:
         try:
-            supplier = Supplier.objects.get(pk=supplier_id)
+            supplier = SupplierModel.objects.get(pk=supplier_id)
             shouldSetupFb = shouldSetupFb or isFbChannel(supplier.channel)
             shouldSetupInstagram = shouldSetupInstagram or supplier.channel == SupplierChannel.INSTAGRAM
             suppliers.append(supplier)
