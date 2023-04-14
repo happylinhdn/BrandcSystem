@@ -26,13 +26,3 @@ class Command(BaseCommand):
             print("%d Missing item, ids is: %s" % (countMiss, log))
         else:
             print("All items is correct, no missing")
-
-        # KhanhHoaCount1 = Supplier.objects.filter(location='Khánh Hoà').count()
-        # KhanhHoaCount2 = Supplier.objects.filter(location='Khánh Hòa').count()
-        # self.stdout.write(self.style.SUCCESS('Successfully Read All KhanhHoaCount1 Supplier "%s"' % KhanhHoaCount1))
-        # self.stdout.write(self.style.SUCCESS('Successfully Read All KhanhHoaCount2 Supplier "%s"' % KhanhHoaCount2))
-        # Supplier.objects.filter(location='Khánh Hoà').update(location='Khánh Hòa')
-        # KhanhHoaCount1 = Supplier.objects.filter(location='Khánh Hoà').count()
-        # KhanhHoaCount2 = Supplier.objects.filter(location='Khánh Hòa').count()
-        # self.stdout.write(self.style.SUCCESS('Update after KhanhHoaCount1 Supplier "%s"' % KhanhHoaCount1))
-        # self.stdout.write(self.style.SUCCESS('Update after KhanhHoaCount2 Supplier "%s"' % KhanhHoaCount2))

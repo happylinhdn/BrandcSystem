@@ -210,3 +210,100 @@ class Supplier(models.Model):
 
 class ExcelFile(models.Model):
     file = models.FileField(upload_to="excel")
+
+
+class DummyModel(models.Model):
+    #no = models.IntegerField() # todo: auto increase
+    name = models.CharField(max_length=100, null=True)
+    link = models.CharField(max_length=300, null=True)
+    channel = models.CharField(max_length=18, choices=SupplierChannel.choices, null=True)
+    follower = models.CharField(max_length=20) # 17k -> 17000, 17M -> 17000000 
+    follower_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
+    kol_tier = models.CharField(max_length=20, editable=False, null=True)
+    
+    engagement_rate_percent = models.FloatField(verbose_name='ER(%)', null=True,)
+    engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
+
+    location = models.CharField(max_length=20, choices=Location.choices, null=True )
+    year_of_birth = models.IntegerField(
+        null=True,
+        validators=[
+            MaxValueValidator(2030),
+            MinValueValidator(1900)
+        ],
+        blank=True
+        )
+    gender = models.CharField(max_length=10, choices=Gender.choices, null=True)
+    
+    industries = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
+    #ORIGINAL COST
+    original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True, blank=True)
+    original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
+    kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
+
+    #DISCOUNT, SUPPLIER NAME
+    discount = models.CharField(max_length=150, null=True, blank=True)
+    supplier_name = models.CharField(max_length=200, null=True, blank=True)
+
+    #BOOKING CONTACT: Name, Phone, Email
+    booking_contact_name = models.CharField(max_length=200, null=True, blank=True)
+    booking_contact_phone = models.CharField(max_length=200, null=True, blank=True)
+    booking_contact_email = models.CharField(max_length=200, null=True, blank=True)
+
+    profile = models.CharField(verbose_name='Profile/Quotation', max_length=300, null=True, blank=True)
+
+    latest_update = models.DateTimeField(null=True, blank=True)
+    #HANDLE BY
+    handle_by = models.CharField(max_length=100, null=True, blank=True)
+    #GROUP CHAT NAME
+    group_chat_name = models.CharField(max_length=100, null=True, blank=True)
+    #Kênh (Zalo, Viber or Facebook) 
+    group_chat_channel = models.CharField(verbose_name='Group Chat Channel', max_length=8, choices=Kenh.choices, null=True, blank=True)
+    #Set Leader Mode to Ms. Lana
+    lana_leader = models.BooleanField(default = False, null=True)
+    #History
+    history = models.DateTimeField(auto_now_add=True, null=True)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, blank=True)
+
+
+    def kol_tier_detect(self):
+        number = int(self.follower_2)
+        if number in range(0, 10000):
+            return "Nano influencer"
+        elif number in range(10000, 50000):
+            return "Micro influencer"
+        elif number in range(50000, 500000):
+            return "Mid tier influencer"
+        elif number in range(500000, 1000000):
+            return "Macro influencer"
+        elif number >= 1000000:
+            return "Mega influencer"
+        else:
+            return "Unknown"
+
+    def engagement_rate_absolute_calc(self):
+        follower_value = self.follower_2
+        rate = 0.0
+        try:
+            rate = self.engagement_rate_percent or 0
+        except:
+            rate = 100
+            print("Can not convert engagement_rate_percent")
+
+        return follower_value * rate/100
+
+    def engagement_rate_absolute_display_calc(self):
+        if self.engagement_rate_absolute >= 1000000:
+            temp = self.engagement_rate_absolute/1000000
+            return "{0}M".format(round(temp, 2))
+        
+        if self.engagement_rate_absolute >= 1000:
+            temp = self.engagement_rate_absolute/1000
+            return "{0}K".format(round(temp, 2))
+        
+        return "{0}".format(round(self.engagement_rate_absolute, 2))
+
+    def __str__(self):
+        return self.name
