@@ -3,7 +3,7 @@ from Supplier.models import SupplierModel
 from Supplier.supportmodels import isFbChannel
 from Supplier.utility import *
 from Supplier.utility_numbers import *
-from siteconfig.models import BackgroundLog, BackgroundLogDevOnly
+from siteconfig.models import BackgroundLogDevOnly
 from Supplier.utility_sync import SyncUtility
 import re
 

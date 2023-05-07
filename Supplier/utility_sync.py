@@ -5,6 +5,8 @@ import datetime
 from Supplier.utility import *
 from Supplier.utility_numbers import *
 from django.utils import timezone
+from datetime import timedelta
+
 
 class SyncUtility:
     def __new__(cls, *args, **kwargs):
@@ -20,12 +22,14 @@ class SyncUtility:
         should_sync = self.should_sync()
         if should_sync == False:
             logObj = self.saveLog(logObj, 'Stop by config, ', True)
-            return
-        for channel in SupplierChannel.choices:
-            if support_sync(channel[0]):
-                self.sync_channel(channel[0])
-            else:
-                logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
+        else:
+            for channel in SupplierChannel.choices:
+                if support_sync(channel[0]):
+                    self.sync_channel(channel[0])
+                else:
+                    logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
+        # clean old log
+        self.cleanOldLogs()
 
     def sync_channel(self, channel):
         suppliers = SupplierModel.objects.filter(channel=channel).order_by('id')
@@ -201,3 +205,10 @@ class SyncUtility:
             return BackgroundLogDevOnly(log = textLog, isSuccess = isSuccess)
         else:
             return BackgroundLog(log = textLog, isSuccess = isSuccess)
+    
+    def cleanOldLogs(self):
+        aPastWeek = timezone.now() - timedelta(days=7)
+        oldDB = BackgroundLog.objects.filter(time__lte=aPastWeek)
+        count = oldDB.count()
+        if count > 0:
+            oldDB.delete()
