@@ -9,6 +9,48 @@ def detectNumber(input):
         return output
     return None
 
+def convert_to_float_withoutException(text_input):
+    correct_input = text_input or '-1'
+    upper_input = correct_input.upper()#.replace(",",".")
+    if upper_input.count(',') >= 2:
+        upper_input = upper_input.replace(',','')
+    if upper_input.count('.') >= 2:
+        upper_input = upper_input.replace('.','')
+        
+    value = 0
+    if 'K' in upper_input:
+        upper_input = upper_input.replace(',', '.')
+        tempK = upper_input.split("K")
+        try:
+            value = float(tempK[0]) * 1000
+        except:
+            print("Can not convert thousands")
+            value = -1
+            #raise Exception("The value of follower is not valid: " + str(text_input  or ''))
+
+    elif 'M' in upper_input:
+        upper_input = upper_input.replace(',', '.')
+        tempK = upper_input.split("M")
+        try:
+            value = float(tempK[0]) * 1000000
+        except:
+            print("Can not convert million")
+            value = -1
+            #raise Exception("The value of follower is not valid: " + str(text_input  or ''))
+    else:
+        try:
+            upper_input = upper_input.replace('.','') #todo: consider In VN 1.000 -> 1000
+            upper_input = upper_input.replace(',','') #todo: consider In VN 1,000 -> 1000
+            value = float(upper_input)
+        except:
+            try:
+                upper_input = detectNumber(upper_input)
+                value = float(upper_input)
+            except:
+                value = 0
+                #raise Exception("The value of follower is not valid: " + str(text_input or ''))
+    return value
+
 def convert_to_float(follower_input):
     follower = follower_input or '-1'
     upperFollower = follower.upper()#.replace(",",".")

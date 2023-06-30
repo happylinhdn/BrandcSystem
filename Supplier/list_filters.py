@@ -449,3 +449,44 @@ class YearRangeFilter(SimpleListFilter):
             return queryset.filter(year_of_birth__gte=p1991, year_of_birth__lte=p2000)
         if self.value() == '4':
             return queryset.filter(year_of_birth__gte=p2001)
+
+class KPIRangeFilter(SimpleListFilter):
+    title = 'KPI'
+    parameter_name = 'kpi'
+
+    def lookups(self, request, model_admin):
+        return (
+          ('1', _('< 10K')),
+          ('2', _('10K-50K')),
+          ('3', _('50K-100K')),
+          ('4', _('100K-500K')),
+          ('5', _('500K-1M')),
+          ('6', _('>1M')),
+          ('7', _('Others')),
+       )
+
+
+
+    def queryset(self, request, queryset):
+        # to decide how to filter the queryset.
+        # return queryset.filter(fields__contains=self.value())
+        p10 = 10000
+        p50 = 50000
+        p100 = 100000
+        p500 = 500000
+        p1M = 1000000
+        if self.value() == '1':
+            return queryset.filter(kpi_2__gte=0, kpi_2__lt=p10)
+        if self.value() == '2':
+            return queryset.filter(kpi_2__gte=p10, kpi_2__lt=p50)
+                
+        if self.value() == '3':
+            return queryset.filter(kpi_2__gte=p50, kpi_2__lt=p100)
+        if self.value() == '4':
+            return queryset.filter(kpi_2__gte=p100, kpi_2__lt=p500)
+        if self.value() == '5':
+            return queryset.filter(kpi_2__gte=p500, kpi_2__lt=p1M)
+        if self.value() == '6':
+            return queryset.filter(kpi_2__gte=p1M)
+        if self.value() == '7':
+            return queryset.filter(kpi_2__lte=-1)

@@ -40,6 +40,7 @@ class SupplierModel(models.Model):
     original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True, blank=True)
     original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
     kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
+    kpi_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
 
     #DISCOUNT, SUPPLIER NAME
     discount = models.CharField(max_length=150, null=True, blank=True)
@@ -110,8 +111,10 @@ class SupplierModel(models.Model):
     
     def valid_form(self):
         self.follower_2 = convert_to_float(str(self.follower) or '0')
-        
         self.follower = convert_to_string_number(self.follower_2)
+        self.kpi_2 = convert_to_float_withoutException(str(self.kpi) or '0')
+        self.kpi = convert_to_string_number(self.kpi_2)
+        
         self.kol_tier = self.kol_tier_detect()
         self.engagement_rate_absolute = self.engagement_rate_absolute_calc() 
         
