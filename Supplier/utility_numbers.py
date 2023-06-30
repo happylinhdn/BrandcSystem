@@ -24,7 +24,7 @@ def convert_to_float_withoutException(text_input):
         try:
             value = float(tempK[0]) * 1000
         except:
-            print("Can not convert thousands")
+            print("Can not convert thousands of " + + str(upper_input))
             value = -1
             #raise Exception("The value of follower is not valid: " + str(text_input  or ''))
 
@@ -34,20 +34,27 @@ def convert_to_float_withoutException(text_input):
         try:
             value = float(tempK[0]) * 1000000
         except:
-            print("Can not convert million")
+            print("Can not convert million of " + str(upper_input))
             value = -1
             #raise Exception("The value of follower is not valid: " + str(text_input  or ''))
     else:
         try:
-            upper_input = upper_input.replace('.','') #todo: consider In VN 1.000 -> 1000
-            upper_input = upper_input.replace(',','') #todo: consider In VN 1,000 -> 1000
+            print("start convert " + str(upper_input))
             value = float(upper_input)
         except:
+            print("start convert " + str(upper_input) + ' face error step 1')
             try:
-                upper_input = detectNumber(upper_input)
+                upper_input = upper_input.replace('.','') #todo: consider In VN 1.000 -> 1000
+                upper_input = upper_input.replace(',','') #todo: consider In VN 1,000 -> 1000
                 value = float(upper_input)
             except:
-                value = 0
+                print("start convert " + str(upper_input) + ' face error step 2')
+                try:
+                    upper_input = detectNumber(upper_input)
+                    value = float(upper_input)
+                except:
+                    print("start convert " + str(upper_input) + ' face error step 3')
+                    value = 0
                 #raise Exception("The value of follower is not valid: " + str(text_input or ''))
     return value
 
