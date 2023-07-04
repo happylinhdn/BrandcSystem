@@ -74,7 +74,7 @@ def update_supplier(supplier, d):
     supplier.original_cost_video = d[11]
     supplier.original_cost_event = d[12]
     supplier.kpi = d[13]
-    supplier.discount = d[14]
+    supplier.note = d[14]
     supplier.supplier_name = d[15]
     supplier.booking_contact_name = d[16]
     supplier.booking_contact_phone = d[17]

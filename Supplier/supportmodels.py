@@ -45,7 +45,7 @@ class Fields(models.TextChoices):
     Kid = 'Kid', _('Kid')
     Hot_Mom_Dad = 'Hot Mom/Dad', _('Hot Mom/Dad')
     Automotive = 'Automotive', _('Automotive')
-    Director = 'Director', _('Director')
+    Film_Production = 'Film Production', _('Film Production')
     Actor_Actress = 'Actor/Actress', _('Actor/Actress')
     Health_Medicine = 'Health & Medicine', _('Health & Medicine')
     Youth_GenZ = 'Youth & GenZ', _('Youth & GenZ')
@@ -95,8 +95,8 @@ def Family_keys():
 
 def Automotive_keys():
     return [ Fields.Automotive]
-def Director_keys():
-    return [ Fields.Director]
+def Film_Production_keys():
+    return [ Fields.Film_Production]
 def Actor_Actress_keys():
     return [ Fields.Actor_Actress]
 def Health_Medicine_keys():

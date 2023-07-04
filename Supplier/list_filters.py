@@ -15,7 +15,7 @@ Property_RealEstateCategory = 'Property & Real estate', _('8. Property & Real es
 FinancialCategory = 'Financial', _('9. Financial')
 FamilyCategory = 'Family', _('10. Family')
 AutomotiveCategory = 'Automotive', _('11. Automotive')
-DirectorCategory = 'Director', _('12. Director')
+FilmProductionCategory = 'Film Production', _('12. Film Production')
 Actor_ActressCategory = 'Actor/Actress', _('13. Actor/Actress')
 Health_MedicineCategory = 'Health & Medicine', _('14. Health & Medicine')
 Youth_GenZCategory = 'Youth & GenZ', _('15. Youth & GenZ')
@@ -47,7 +47,7 @@ class IndustryFilter(SimpleListFilter):
         all_Family_fields = []
 
         all_Automotive_fields = []
-        all_Director_fields = []
+        all_Film_Production_fields = []
         all_Actor_Actress_fields = []
         all_Health_Medicine_fields = []
         all_Youth_GenZ_fields = []
@@ -83,8 +83,6 @@ class IndustryFilter(SimpleListFilter):
                 all_Family_fields.append(c)
             # elif c[0] in Automotive_keys():
             #     all_Automotive_fields.append(c)
-            # elif c[0] in Director_keys():
-            #     all_Director_fields.append(c)
             # if c[0] in Actor_Actress_keys():
             #     all_Actor_Actress_fields.append(c)
             # elif c[0] in Health_Medicine_keys():
@@ -152,8 +150,8 @@ class IndustryFilter(SimpleListFilter):
         for c in all_Automotive_fields:
             result.append(c)
 
-        result.append(DirectorCategory)
-        for c in all_Director_fields:
+        result.append(FilmProductionCategory)
+        for c in all_Film_Production_fields:
             result.append(c)
         
         result.append(Actor_ActressCategory)
@@ -241,8 +239,8 @@ class IndustryFilter(SimpleListFilter):
             elif value == AutomotiveCategory[0]:
                 for f in Automotive_keys():
                     data = data | queryset.filter(industries__contains=f)
-            elif value == DirectorCategory[0]:
-                for f in Director_keys():
+            elif value == FilmProductionCategory[0]:
+                for f in Film_Production_keys():
                     data = data | queryset.filter(industries__contains=f)
             elif value == Actor_ActressCategory[0]:
                 for f in Actor_Actress_keys():

@@ -42,8 +42,8 @@ class SupplierModel(models.Model):
     kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
     kpi_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
 
-    #DISCOUNT, SUPPLIER NAME
-    discount = models.CharField(max_length=150, null=True, blank=True)
+    #Note, SUPPLIER NAME
+    note = models.CharField(max_length=150, null=True, blank=True)
     supplier_name = models.CharField(max_length=200, null=True, blank=True)
 
     #BOOKING CONTACT: Name, Phone, Email
@@ -188,7 +188,7 @@ class SupplierModel(models.Model):
             'ORIGINAL COST - EVENT': int(self.original_cost_event or 0),
             'ORIGINAL COST - TVC':int(self.original_cost_tvc or 0),
             'KPI': self.kpi,
-            'DISCOUNT': self.discount,
+            'Note': self.note,
             'SUPPLIER NAME': self.supplier_name,
             'BOOKING CONTACT NAME': self.booking_contact_name,
             'BOOKING CONTACT PHONE': self.booking_contact_phone,
@@ -248,8 +248,8 @@ class DummyModel(models.Model):
     original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
     kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
 
-    #DISCOUNT, SUPPLIER NAME
-    discount = models.CharField(max_length=150, null=True, blank=True)
+    #Note, SUPPLIER NAME
+    note = models.CharField(max_length=150, null=True, blank=True)
     supplier_name = models.CharField(max_length=200, null=True, blank=True)
 
     #BOOKING CONTACT: Name, Phone, Email

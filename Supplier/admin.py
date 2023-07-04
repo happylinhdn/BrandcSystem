@@ -67,7 +67,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         ('ABOUT SUPPLIER', {
             'fields': (
                 ('original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc'), 
-                ('kpi', 'discount'), 
+                ('kpi', 'note'), 
                 ('supplier_name', 
                 'booking_contact_name', 'booking_contact_phone', 'booking_contact_email'), 'profile', 'latest_update')
         }),
@@ -78,7 +78,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
     'location', 'year_display', 'gender', 'industries', 'original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc',
-    'kpi', 'discount', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
+    'kpi', 'note', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
     'group_chat_channel', 'lana_leader' , 'modified_by'
     ]
     list_display_links  = ['name',]
