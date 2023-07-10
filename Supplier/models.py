@@ -94,15 +94,16 @@ class SupplierModel(models.Model):
         return follower_value * rate/100
 
     def engagement_rate_absolute_display_calc(self):
-        if self.engagement_rate_absolute >= 1000000:
-            temp = self.engagement_rate_absolute/1000000
-            return "{0}M".format(round(temp, 2))
+        # if self.engagement_rate_absolute >= 1000000:
+        #     temp = self.engagement_rate_absolute/1000000
+        #     return "{0}M".format(round(temp, 2))
         
-        if self.engagement_rate_absolute >= 1000:
-            temp = self.engagement_rate_absolute/1000
-            return "{0}K".format(round(temp, 2))
+        # if self.engagement_rate_absolute >= 1000:
+        #     temp = self.engagement_rate_absolute/1000
+        #     return "{0}K".format(round(temp, 2))
         
-        return "{0}".format(round(self.engagement_rate_absolute, 2))
+        # return "{0}".format(round(self.engagement_rate_absolute, 2))
+        return "%.1f" % self.engagement_rate_absolute
 
 
     def save(self, *args, **kwargs):
