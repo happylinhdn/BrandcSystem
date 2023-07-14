@@ -82,14 +82,6 @@ WSGI_APPLICATION = 'BrandcSystem.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE':'django.db.backends.postgresql_psycopg2',
-        'NAME':'brandc',
-        'USER': 'brandcuser',
-        'PASSWORD':'Aesx5099',
-        'HOST':'localhost',
-        'PORT':'5432'
-    }
 }
 
 with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
@@ -102,6 +94,17 @@ with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
                 'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': data['ENGINE'],
+                'NAME': data['NAME'],
+                'USER': data['USER'],
+                'PASSWORD':data['PASSWORD'],
+                'HOST':data['HOST'],
+                'PORT':data['PORT']
             }
         }
 
@@ -162,8 +165,8 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 IMPORT_EXPORT_CHUNK_SIZE = 100
 
 CRONJOBS = [
-    #('00 16 * * *', 'siteconfig.cron.sync_follower', '>> /tmp/scheduled_job.log'), #23:00
-    ('00 16 * * *', 'siteconfig.cron.sync_follower'), #23:00
+    ('00 11 * * *', 'siteconfig.cron.sync_follower', '>> /tmp/scheduled_job.log'), #18:00
+    #('00 16 * * *', 'siteconfig.cron.sync_follower'), #23:00
     #('43 12 * * *', 'siteconfig.cron.sync_follower_ids', '>> /tmp/scheduled_job_dev.log'), #19:42
     #('*/5 * * * *', 'django.core.management.call_command', ['fetchfollower','--all']),
 ]

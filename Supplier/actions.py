@@ -86,6 +86,7 @@ class ExportCsvMixin:
             #print(col_idx)
             worksheet.set_column(col_idx, col_idx, column_length)
 
+        worksheet.set_column('H:H', 15, num_format)
         worksheet.set_column('J:J', 15)
         worksheet.set_column('M:M', 15, num_format)
         worksheet.set_column('N:N', 15, num_format)

@@ -102,11 +102,19 @@ def convert_to_float(follower_input):
 def convert_to_string_number(number):
     if number >= 1000000:
         temp = number/1000000
-        return "{0}M".format(round(temp, 2))
+        intTemp = int(temp)
+        if (temp > intTemp or temp < intTemp):
+            return "{0}M".format(round(temp, 2))
+        return "{0}M".format(intTemp)
     
     if number >= 1000:
         temp = number/1000
-        return "{0}K".format(round(temp, 2))
+        intTemp = int(temp)
+        if (temp > intTemp or temp < intTemp):
+            return "{0}K".format(round(temp, 2))
+        return "{0}K" .format(intTemp)
+    intTemp = int(number)
+    if (number == intTemp):
+        return "{0}" .format(intTemp) 
     return "{0}".format(round(number, 2))
-
 

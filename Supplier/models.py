@@ -94,17 +94,7 @@ class SupplierModel(models.Model):
         return follower_value * rate/100
 
     def engagement_rate_absolute_display_calc(self):
-        # if self.engagement_rate_absolute >= 1000000:
-        #     temp = self.engagement_rate_absolute/1000000
-        #     return "{0}M".format(round(temp, 2))
-        
-        # if self.engagement_rate_absolute >= 1000:
-        #     temp = self.engagement_rate_absolute/1000
-        #     return "{0}K".format(round(temp, 2))
-        
-        # return "{0}".format(round(self.engagement_rate_absolute, 2))
-        return "%.1f" % self.engagement_rate_absolute
-
+        return convert_to_string_number(self.engagement_rate_absolute)
 
     def save(self, *args, **kwargs):
         self.valid_form()
@@ -168,7 +158,24 @@ class SupplierModel(models.Model):
 
     def __str__(self):
         return self.name
-
+    
+    def parse_num_string(self, number_float):
+        val_float = number_float or 0
+        val_int = int(val_float)
+        out_str = val_float
+        if val_float > val_int or val_float < val_int :
+            out_str = "%.1f" % val_float
+        else :
+            out_str = "{0}" .format(val_int)
+        return out_str
+    
+    def parse_num(self, number_float):
+        val_float = number_float or 0
+        val_int = int(val_float)
+        if val_float == val_int :
+            return val_int
+        else :
+            return val_float
         
     def parse_to_json(self):
         return {
@@ -179,7 +186,7 @@ class SupplierModel(models.Model):
             'FOLLOWER': self.follower,
             'KOL TIER': self.kol_tier,
             'ER(%)': self.engagement_rate_percent,
-            'ER (Ab.)': self.engagement_rate_absolute_display_calc(),
+            'ER (Ab.)': self.parse_num(self.engagement_rate_absolute), #self.engagement_rate_absolute_display_calc(),
             'LOCATION': self.location,
             'YEAR': self.year_of_birth,
             'GENDER': self.gender,
@@ -301,15 +308,7 @@ class DummyModel(models.Model):
         return follower_value * rate/100
 
     def engagement_rate_absolute_display_calc(self):
-        if self.engagement_rate_absolute >= 1000000:
-            temp = self.engagement_rate_absolute/1000000
-            return "{0}M".format(round(temp, 2))
-        
-        if self.engagement_rate_absolute >= 1000:
-            temp = self.engagement_rate_absolute/1000
-            return "{0}K".format(round(temp, 2))
-        
-        return "{0}".format(round(self.engagement_rate_absolute, 2))
+        return convert_to_string_number(self.engagement_rate_absolute)
 
     def __str__(self):
         return self.name

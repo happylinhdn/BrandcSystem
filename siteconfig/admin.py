@@ -5,14 +5,20 @@ from .models import BackgroundLog, SyncConfig, BackgroundLogDevOnly
 @admin.register(SyncConfig)
 class SyncConfigAdmin(admin.ModelAdmin):
     readonly_fields=('name', )
-    list_display = ['id', 'name', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+    list_display = ['id', 'name', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'plan', 'last_date_sync']
     fieldsets = (
     ('Info', {
         'fields': ('name', )
     }),
+    ('Plan', {
+        'fields': ('plan', )
+    }),
     ('Weekday', {
         'fields': (
             ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'), )
+    }),
+    ('Log', {
+        'fields': ('last_date_sync', )
     }),
 )
 

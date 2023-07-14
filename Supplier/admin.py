@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.utils.translation import gettext as _
-from .models import SupplierModel, DummyModel
+from .models import SupplierModel
 from .list_filters import IndustryFilter, CostRangeFilter, YearRangeFilter, KPIRangeFilter
 from .forms import SupplierForm
 from .actions import ExportCsvMixin
@@ -36,29 +36,13 @@ class CustomPaginator(Paginator):
 # Register your models here.
 @admin.register(SupplierModel)
 class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
+    list_select_related = True
     class Media:
         css = {
             'all': ('css/fancy.css',)
         }
     form = SupplierForm
     paginator = CustomPaginator
-    indexCnt = 0
-
-    def index_counter(self, obj):
-        page = self.PAGE_INDEX or 1
-        min = (int(page) - 1) * self.list_per_page + 1
-        max = int(page) * self.list_per_page
-        count = SupplierModel.objects.count()
-        print('index_counter', page, min, max, count)
-        if self.indexCnt < min:
-            self.indexCnt = min - 1
-        if self.indexCnt < max and self.indexCnt < count:
-            self.indexCnt += 1
-        else:
-            self.indexCnt = min
-        return self.indexCnt
-
-    index_counter.short_description = '#'
 
     fieldsets = (
         ('ABOUT KOL', {
@@ -77,7 +61,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     )
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
-    'location', 'year_display', 'gender', 'industries', 'original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc',
+    'location', 'year_display', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display',
     'kpi', 'note', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
     'group_chat_channel', 'lana_leader' , 'modified_by'
     ]
@@ -88,7 +72,18 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     actions = ['export_as_xls', 'sync_follower']
     ordering = ['id']
 
+    def original_cost_video_display(self, obj):
+        return "{:,}".format(obj.original_cost_video or 0)
     
+    def original_cost_picture_display(self, obj):
+        return "{:,}".format(obj.original_cost_picture or 0)
+    
+    def original_cost_event_display(self, obj):
+        return "{:,}".format(obj.original_cost_event or 0)
+    def original_cost_tvc_display(self, obj):
+        return "{:,}".format(obj.original_cost_tvc or 0)
+    
+
     def booking_contact(self, obj):
         return """Name:{0} - Phone: {1} - Email:{2}""".format(obj.booking_contact_name or '-', obj.booking_contact_phone or '-', obj.booking_contact_email or '-')
     
@@ -117,22 +112,3 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     def has_import_permission(self, request):
         has_perm = request.user.has_perm('Supplier.import_data_as_admin')
         return has_perm
-
-    # def get_queryset(self, request):
-    #     print('get_queryset')
-    #     print(request)
-    #     p = request.GET.get('p') or 1
-    #     qs = super().get_queryset(request)
-    #     # if request.user.is_superuser:
-    #     #     return qs
-    #     return qs#qs.filter(author=request.user)
-
-    # def get_search_results(self, request, queryset, search_term):
-    #     print('get_search_results')
-    #     queryset, duplicate = super().get_search_results(
-    #         request, queryset, search_term,
-    #     )
-    #     p = request.GET.get('p') or 1
-    #     self.PAGE_INDEX = p
-        
-    #     return queryset, duplicate

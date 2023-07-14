@@ -1,4 +1,6 @@
 .DS_Store
+siteconfig/migrations/
+siteconfig/migrations/*
 Supplier/migrations/
 Supplier/migrations/*
 secrets.json

@@ -1,11 +1,12 @@
 from Supplier.models import SupplierModel
 from Supplier.supportmodels import SupplierChannel
-from siteconfig.models import BackgroundLog, SyncConfig, BackgroundLogDevOnly
+from siteconfig.models import BackgroundLog, SyncConfig, BackgroundLogDevOnly, SyncPlan
 import datetime
 from Supplier.utility import *
 from Supplier.utility_numbers import *
 from django.utils import timezone
 from datetime import timedelta
+# from datetime import datetime
 
 
 class SyncUtility:
@@ -18,16 +19,19 @@ class SyncUtility:
         self.forDev = forDev
 
     def sync_channels(self):
-        logObj = self.saveLog(None, 'START, ', True)
+        logObj = self.saveLog(None, 'START sync thread, ', True)
         should_sync = self.should_sync()
+        print("3. Check should_sync = ", should_sync)
         if should_sync == False:
-            logObj = self.saveLog(logObj, 'Stop by config, ', True)
+            logObj = self.saveLog(logObj, 'Stop sync thread by config, ', True)
         else:
+            self.store_last_sync()
             for channel in SupplierChannel.choices:
                 if support_sync(channel[0]):
                     self.sync_channel(channel[0])
                 else:
                     logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
+            logObj = self.saveLog(logObj, 'Finish sync thread, ', True)
         # clean old log
         self.cleanOldLogs()
 
@@ -44,22 +48,58 @@ class SyncUtility:
         self.saveLog(None, 'sync_channel %s END'%channel, True)
 
     def should_sync(self):
-        should_sync = True
-        x_date = datetime.date.today()
-        no = x_date.weekday()
+        print('Check should_sync')
+        is_correct_weekday = True
+        today_date = datetime.date.today()
+        no = today_date.weekday()
         #self.saveLog(None, 'should_sync today is %s' % no, True)
+        last_date_sync = datetime.datetime.strptime("2023-06-01", "%Y-%m-%d") 
+        next_date_sync = datetime.datetime.strptime("2023-06-15", "%Y-%m-%d") 
+        plan = SyncPlan.BiWeekly
+
 
         for config in SyncConfig.objects.all():
             if config.name == 'Sync follower' :
-                should_sync = (no == 0 and config.mon) or \
+                last_date_sync = datetime.datetime.strptime(config.last_date_sync, "%Y-%m-%d")  
+                plan = config.plan
+                is_correct_weekday = (no == 0 and config.mon) or \
                             (no == 1 and config.tue) or \
                             (no == 2 and config.wed) or \
                             (no == 3 and config.thu) or \
                             (no == 4 and config.fri) or \
                             (no == 5 and config.sat) or \
                             (no == 6 and config.sun)
+                
                 break
-        return should_sync
+        if is_correct_weekday != True:
+            return is_correct_weekday
+        
+        if plan == SyncPlan.Weekly:
+            next_date_sync = last_date_sync + timedelta(weeks=1)
+        elif plan == SyncPlan.BiWeekly:
+            next_date_sync = last_date_sync + timedelta(weeks=2)
+        elif plan == SyncPlan.ThreeWeekly:
+            next_date_sync = last_date_sync + timedelta(weeks=3)
+        else:
+            next_date_sync = last_date_sync + timedelta(weeks=4)
+        
+        if next_date_sync.date() > today_date:
+            print("should_sync next_date_sync > Today --> skip")
+            return False
+        else:
+            print("should_sync next_date_sync <= Today -> Start")
+            return True
+
+    def store_last_sync(self):
+        print("4. Do store_last_sync ")
+        today_date = datetime.date.today()
+        for config in SyncConfig.objects.all():
+            if config.name == 'Sync follower' :
+                print("4. Do store_last_sync last_date_sync --> ", today_date.strftime("%Y-%m-%d"))
+                config.last_date_sync = today_date.strftime("%Y-%m-%d")
+                config.save()
+                break
+            
 
     def sync_follower(self, start_page = 0):
         logObj = self.saveLog(None, 'START, ', True)
@@ -67,6 +107,8 @@ class SyncUtility:
         if should_sync == False:
             logObj = self.saveLog(logObj, 'Stop by config, ', True)
             return
+
+        self.store_last_sync()
 
         count = SupplierModel.objects.count()
         pages = int(count/500) + 1

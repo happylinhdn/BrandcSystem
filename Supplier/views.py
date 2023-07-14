@@ -1,10 +1,10 @@
-from ast import IsNot
 from django.shortcuts import render
 from .models import SupplierModel, ExcelFile
 import pandas as pd
 from django.http import JsonResponse 
 from django.conf import settings
 from datetime import datetime
+import os
 
 # Create your views here.
 
@@ -18,7 +18,7 @@ def export_supplier_to_excel(request):
         'status': 200
     })
 
-import os
+
 def import_supplier(request):
     if (request.method == 'POST'):
         file = request.FILES['files']
