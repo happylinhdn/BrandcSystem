@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import csv
-import imp
 from importlib.metadata import requires
 from django.http import HttpResponse
-
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import pandas as pd
@@ -50,7 +49,7 @@ class ExportCsvMixin:
         """
         limit = -1
         if request.user.has_perm("Supplier.export_excel_1000_admin"):
-            limit = 1000#settings.EXPORT_RECORDS_ADMIN_LIMIT
+            limit = settings.EXPORT_RECORDS_ADMIN_LIMIT
         elif request.user.has_perm("Supplier.export_excel_100_buyer"):
             limit = 100
         elif request.user.has_perm("Supplier.export_excel_50_seller"):
