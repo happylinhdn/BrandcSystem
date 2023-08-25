@@ -54,7 +54,7 @@ def login_instagram(driver):
     with open(os.path.join(settings.BASE_DIR, 'secrets.json')) as secrets_file:
         data = json.load(secrets_file)
         email = data['s1']
-        pwd = data['s2']
+        pwd = data['rin']
     try:
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="loginForm"]/div/div[1]/div/label/input'))).send_keys(email)
     except:
@@ -114,7 +114,7 @@ def login_facebook(driver):
         with open(os.path.join(settings.BASE_DIR, 'secrets.json')) as secrets_file:
             data = json.load(secrets_file)
             email = data['s1']
-            pwd = data['s2']
+            pwd = data['rfb']
 
         emailView.send_keys(email)
         pwdView.send_keys(pwd)

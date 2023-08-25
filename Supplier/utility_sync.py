@@ -6,6 +6,7 @@ from Supplier.utility import *
 from Supplier.utility_numbers import *
 from django.utils import timezone
 from datetime import timedelta
+import gc  
 # from datetime import datetime
 
 
@@ -19,6 +20,7 @@ class SyncUtility:
         self.forDev = forDev
 
     def sync_channels(self):
+        gc.collect()
         logObj = self.saveLog(None, 'START sync thread, ', True)
         should_sync = self.should_sync()
         print("3. Check should_sync = ", should_sync)
@@ -48,7 +50,6 @@ class SyncUtility:
         self.saveLog(None, 'sync_channel %s END'%channel, True)
 
     def should_sync(self):
-        print('Check should_sync')
         is_correct_weekday = True
         today_date = datetime.date.today()
         no = today_date.weekday()
@@ -84,22 +85,17 @@ class SyncUtility:
             next_date_sync = last_date_sync + timedelta(weeks=4)
         
         if next_date_sync.date() > today_date:
-            print("should_sync next_date_sync > Today --> skip")
             return False
         else:
-            print("should_sync next_date_sync <= Today -> Start")
             return True
 
     def store_last_sync(self):
-        print("4. Do store_last_sync ")
         today_date = datetime.date.today()
         for config in SyncConfig.objects.all():
             if config.name == 'Sync follower' :
-                print("4. Do store_last_sync last_date_sync --> ", today_date.strftime("%Y-%m-%d"))
                 config.last_date_sync = today_date.strftime("%Y-%m-%d")
                 config.save()
-                break
-            
+                break          
 
     def sync_follower(self, start_page = 0):
         logObj = self.saveLog(None, 'START, ', True)
@@ -138,14 +134,37 @@ class SyncUtility:
         logFail = None
         driver = None
         logObj = self.saveLog(None, 'sync_suppliers START ', True)
-        try:
-            driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
-        except:
-            logObj = self.saveLog(logObj, 'Init driver fail, ', True)
-            return
+        gap_memory = 0
+        init_driver_counter = 0
+        # try:
+        #     driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
+        # except:
+        #     logFail = self.saveLog(logFail, 'Init driver fail, ', False)
+        #     return
 
         for obj in suppliers:
             if support_sync(obj.channel):
+                if gap_memory == 0 or driver is None:
+                    try:
+                        if driver:
+                            try:
+                                logObj = self.saveLog(logObj, 'Close Driver %s, ' % str(init_driver_counter), True)
+                                close_driver(driver)
+                                driver = None
+                            except:
+                                pass
+                        gc.collect()
+                        logObj = self.saveLog(logObj, 'Init driver %s, '% str(init_driver_counter), True)
+                        init_driver_counter = init_driver_counter + 1
+                        driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
+                    except:
+                        logFail = self.saveLog(logFail, 'Init driver fail, ', False)
+                        return
+                
+                gap_memory = gap_memory + 1
+                if gap_memory > 100:
+                    gap_memory = 0
+
                 logObj = self.saveLog(logObj, '%s, '% obj.id, True)
                 result = read_followers(driver, obj)
                 if result >= 0:
@@ -169,11 +188,11 @@ class SyncUtility:
                 close_driver(driver)
                 driver = None
             except:
+                logFail = self.saveLog(logFail, 'Close Driver Fail, ', False)
                 pass
 
         if len(failDatas) > 0:
             logObj = self.saveLog(logObj, 'sync_suppliers END with %s fail items' % len(failDatas), True)
-            #self.sync_follower_recheck(failDatas)
         else:
             logObj = self.saveLog(logObj, 'sync_suppliers END', True)
 
@@ -227,21 +246,24 @@ class SyncUtility:
 
     def saveLog(self, logObj, textLog, isSuccess = True):
         print('write log:', textLog)
-        logInstance = logObj
-        if logInstance == None:
-            logInstance = self.getLog(textLog, isSuccess)
-        else:
-            logInstance.log = logInstance.log + textLog
-            logInstance.time = timezone.now()
+        try:
+            logInstance = logObj
+            if logInstance == None:
+                logInstance = self.getLog(textLog, isSuccess)
+            else:
+                logInstance.log = logInstance.log + textLog
+                logInstance.time = timezone.now()
+            
+            logInstance.save()
         
-        logInstance.save()
-    
-        if len(logInstance.log) > 10000:
-            textLog = ''
-            logInstance = self.getLog(textLog, isSuccess)
-    
-        return logInstance
-    
+            if len(logInstance.log) > 5000:
+                logInstance = self.getLog('', isSuccess)
+        
+            return logInstance
+        except:
+            print('Error when save log', textLog)
+            return None
+        
     def getLog(self, textLog, isSuccess):
         if self.forDev:
             return BackgroundLogDevOnly(log = textLog, isSuccess = isSuccess)
