@@ -129,18 +129,13 @@ class SyncUtility:
         logObj = self.saveLog(logObj, temp_log, True)
 
     def sync_suppliers(self, suppliers, shouldSetupFb = True, shouldSetupInstagram = True):
-        failDatas = []
+        fail_count = 0
         logObj = None
         logFail = None
         driver = None
         logObj = self.saveLog(None, 'sync_suppliers START ', True)
         gap_memory = 0
         init_driver_counter = 0
-        # try:
-        #     driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
-        # except:
-        #     logFail = self.saveLog(logFail, 'Init driver fail, ', False)
-        #     return
 
         for obj in suppliers:
             if support_sync(obj.channel):
@@ -162,7 +157,7 @@ class SyncUtility:
                         return
                 
                 gap_memory = gap_memory + 1
-                if gap_memory > 100:
+                if gap_memory > 10:
                     gap_memory = 0
 
                 logObj = self.saveLog(logObj, '%s, '% obj.id, True)
@@ -179,7 +174,8 @@ class SyncUtility:
                             temp_log = obj.name + '(Save fail %s -> %s),' % (str(old_follower or ''), str(obj.follower or ''))
                             logFail = self.saveLog(logFail, temp_log, False)
                 else:
-                    failDatas.append(obj)
+                    #failDatas.append(obj)
+                    fail_count = fail_count + 1
                     temp_log = (obj.name + '(%s),' % (obj.id) )
                     logFail = self.saveLog(logFail, temp_log, False)
         if driver:
@@ -191,8 +187,8 @@ class SyncUtility:
                 logFail = self.saveLog(logFail, 'Close Driver Fail, ', False)
                 pass
 
-        if len(failDatas) > 0:
-            logObj = self.saveLog(logObj, 'sync_suppliers END with %s fail items' % len(failDatas), True)
+        if fail_count > 0:
+            logObj = self.saveLog(logObj, 'sync_suppliers END with %s fail items' % str(fail_count), True)
         else:
             logObj = self.saveLog(logObj, 'sync_suppliers END', True)
 
