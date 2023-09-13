@@ -1,6 +1,6 @@
 from Supplier.models import SupplierModel
 from Supplier.supportmodels import SupplierChannel
-from siteconfig.models import BackgroundLog, SyncConfig, BackgroundLogDevOnly, SyncPlan
+from siteconfig.models import BackgroundLog, SyncConfig, BackgroundLogDevOnly, SyncPlan, FailLinkCacheModel
 import datetime
 from Supplier.utility import *
 from Supplier.utility_numbers import *
@@ -27,12 +27,18 @@ class SyncUtility:
         if should_sync == False:
             logObj = self.saveLog(logObj, 'Stop sync thread by config, ', True)
         else:
-            self.store_last_sync()
-            for channel in SupplierChannel.choices:
-                if support_sync(channel[0]):
-                    self.sync_channel(channel[0])
-                else:
-                    logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
+            handle_channel = self.store_last_sync()
+            if support_sync(handle_channel):
+                self.sync_channel(handle_channel)
+            else:
+                logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % handle_channel, True)
+                
+            # for channel in SupplierChannel.choices:
+            #     if support_sync(channel[0]):
+            #         self.sync_channel(channel[0])
+            #     else:
+            #         logObj = self.saveLog(logObj, 'Skip sync this channel cause not support now, %s ' % channel[0], True)
+
             logObj = self.saveLog(logObj, 'Finish sync thread, ', True)
         # clean old log
         self.cleanOldLogs()
@@ -90,12 +96,12 @@ class SyncUtility:
             return True
 
     def store_last_sync(self):
-        today_date = datetime.date.today()
         for config in SyncConfig.objects.all():
             if config.name == 'Sync follower' :
-                config.last_date_sync = today_date.strftime("%Y-%m-%d")
+                config.prepare_channel()
                 config.save()
-                break          
+                return config.handle_channel_synced  
+        return None        
 
     def sync_follower(self, start_page = 0):
         logObj = self.saveLog(None, 'START, ', True)
@@ -132,28 +138,29 @@ class SyncUtility:
         fail_count = 0
         logObj = None
         logFail = None
+        logSkip= None
         driver = None
         logObj = self.saveLog(None, 'sync_suppliers START ', True)
         gap_memory = 0
         init_driver_counter = 0
 
         for obj in suppliers:
-            if support_sync(obj.channel):
+            if FailLinkCacheModel.objects.get(link=obj.link):
+                temp_log = 'Skip: %s (%s),' % (obj.name, obj.id)
+                logSkip = self.saveLog(logSkip, temp_log, False)
+            elif support_sync(obj.channel):
                 if gap_memory == 0 or driver is None:
                     try:
                         if driver:
                             try:
-                                logObj = self.saveLog(logObj, 'Close Driver %s, ' % str(init_driver_counter), True)
                                 close_driver(driver)
                                 driver = None
                             except:
                                 pass
                         gc.collect()
-                        logObj = self.saveLog(logObj, 'Init driver %s, '% str(init_driver_counter), True)
                         init_driver_counter = init_driver_counter + 1
                         driver = prepare_driver(shouldSetupFb, shouldSetupInstagram)
                     except:
-                        logFail = self.saveLog(logFail, 'Init driver fail, ', False)
                         return
                 
                 gap_memory = gap_memory + 1
@@ -174,7 +181,8 @@ class SyncUtility:
                             temp_log = obj.name + '(Save fail %s -> %s),' % (str(old_follower or ''), str(obj.follower or ''))
                             logFail = self.saveLog(logFail, temp_log, False)
                 else:
-                    #failDatas.append(obj)
+                    failInfo = FailLinkCacheModel(name = obj.name, link = obj.link)
+                    failInfo.save()
                     fail_count = fail_count + 1
                     temp_log = (obj.name + '(%s),' % (obj.id) )
                     logFail = self.saveLog(logFail, temp_log, False)
@@ -214,15 +222,11 @@ class SyncUtility:
                     if old_follower != new_follwer:
                         try:
                             obj.save()
-                            #temp_log = (obj.name + '(%s -> %s),' % (str(old_follower or ''), str(obj.follower or '')))
-                            #logSuccess = self.saveLog(logSuccess, temp_log, True)
                         except:
                             temp_log = obj.name + '(Save fail %s -> %s),' % (str(old_follower or ''), str(obj.follower or ''))
                             logFail = self.saveLog(logFail, temp_log, False)
                     else:
                         pass
-                        #temp_log = (obj.name + '(-),')
-                        #logSuccess = self.saveLog(logSuccess, temp_log, True)
 
                 else:
                     temp_log = (obj.name + '(%s),' % (obj.id) )

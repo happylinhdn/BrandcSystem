@@ -21,5 +21,5 @@ class Command(BaseCommand):
         sync_thread = SyncUtility(True)
         should_sync = sync_thread.should_sync()
         print("Check should_sync result = ", should_sync)
-        sync_thread.store_last_sync()
-        
+        handle_channel = sync_thread.store_last_sync() 
+        print("handle_channel = ", handle_channel)       
