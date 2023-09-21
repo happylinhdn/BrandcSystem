@@ -42,7 +42,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
             'all': ('css/fancy.css',)
         }
     form = SupplierForm
-    paginator = CustomPaginator
+    # paginator = CustomPaginator
 
     fieldsets = (
         ('ABOUT KOL', {

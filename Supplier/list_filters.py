@@ -107,7 +107,7 @@ class IndustryFilter(SimpleListFilter):
             #     all_Other_fields.append(c)
             
             
-        t_data = [c.industries for c in SupplierModel.objects.all()]
+        #t_data = [c.industries for c in SupplierModel.objects.all()]
         result = []
 
         result.append(MusicCategory)
