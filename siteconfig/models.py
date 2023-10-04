@@ -62,3 +62,20 @@ class FailLinkCacheModel(models.Model):
     time = models.DateTimeField(auto_now_add=True, null=True)
     name = models.CharField(max_length=100, null=True)
     link = models.CharField(max_length=300, null=True)
+
+from django.contrib.auth.models import User
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    download_capability = models.IntegerField(null=True, blank=True, default=1)
+
+class UserEventType(models.TextChoices):
+    Download = 'Download', _('Download')
+
+class UserEventLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    log = models.TextField(null=True)
+    type = models.CharField(verbose_name='Type', max_length=20, choices=UserEventType.choices, null=True, default=UserEventType.Download)
+    time = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.time}"

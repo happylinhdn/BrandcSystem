@@ -15,11 +15,16 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from .utility import *
+from datetime import datetime
+
+from siteconfig.models import UserProfile, UserEventLog
 
 from .supportmodels import SupplierChannel, support_sync
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
+        print("XIn CHAO export_as_csv")
+
         meta = self.model._meta
         field_names = [field.name for field in meta.industries]
 
@@ -46,6 +51,7 @@ class ExportCsvMixin:
         Generic xls export admin action.
         """
         limit = -1
+        in_capability = False
         if request.user.has_perm("Supplier.export_excel_1000_admin"):
             limit = settings.EXPORT_RECORDS_ADMIN_LIMIT
         elif request.user.has_perm("Supplier.export_excel_100_buyer"):
@@ -55,11 +61,29 @@ class ExportCsvMixin:
         else:
             messages.error(request, "This action is only for staff of brandc" )
             return HttpResponseRedirect(request.path_info)
+        
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        if user_profile.download_capability <= 0:
+            in_capability = False
+        else:
+            in_capability = True
+            user_profile.download_capability = user_profile.download_capability - 1
+            user_profile.save()
 
         if limit > 0 and queryset.count() > limit:
             messages.error(request, "Can't export more then %s Records in one go." % str(limit))
+            log = UserEventLog(user=request.user, log="Cố gắng xuất file nhưng chọn quá nhiều items so với qui định", time = datetime.now())
+            log.save()
             return HttpResponseRedirect(request.path_info)
         
+        if in_capability == False:
+            messages.error(request, "Please contact Admin of Brandc to grant the download capability!")
+            log = UserEventLog(user=request.user, log="Cố gắng xuất file nhưng đã hết quota!", time = datetime.now())
+            log.save()
+            return HttpResponseRedirect(request.path_info)
+        log = UserEventLog(user=request.user, log="Xuất file thành công", time = datetime.now())
+        log.save()
+
         data = []
         for obj in queryset:
             data.append(obj.parse_to_json())
