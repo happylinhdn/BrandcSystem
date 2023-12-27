@@ -50,7 +50,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         }),
         ('ABOUT SUPPLIER', {
             'fields': (
-                ('original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc'), 
+                ('original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc', 'original_cost_livestream'), 
                 ('kpi', 'note'), 
                 ('supplier_name', 
                 'booking_contact_name', 'booking_contact_phone', 'booking_contact_email'), 'profile', 'latest_update')
@@ -61,7 +61,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     )
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
-    'location', 'year_display', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display',
+    'location', 'year_display', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display','original_cost_livestream_display',
     'kpi', 'note', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
     'group_chat_channel', 'lana_leader' , 'modified_by'
     ]
@@ -82,6 +82,9 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         return "{:,}".format(obj.original_cost_event or 0)
     def original_cost_tvc_display(self, obj):
         return "{:,}".format(obj.original_cost_tvc or 0)
+    
+    def original_cost_livestream_display(self, obj):
+        return "{:,}".format(obj.original_cost_livestream or 0)
     
 
     def booking_contact(self, obj):

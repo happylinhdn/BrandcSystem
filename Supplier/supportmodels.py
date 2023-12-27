@@ -56,6 +56,7 @@ class Fields(models.TextChoices):
     Technology_Ecommerce = 'Technology & Ecommerce', _('Technology & Ecommerce')
     Celeb = 'Celeb', _('Celeb')
     General = 'General', _('General')
+    Livestream = 'Livestream', _('Livestream')
     Other = 'Other', _('Other')
 
 def Music_keys():
@@ -65,7 +66,7 @@ def Music_keys():
 
 def Entertainment_keys():
     return [
-        Fields.Dancer, Fields.Streamer, Fields.Content_Creator, Fields.Reviewer, Fields.Blogger
+        Fields.Livestream, Fields.Dancer, Fields.Streamer, Fields.Content_Creator, Fields.Reviewer, Fields.Blogger
     ]
 
 def Sport_keys():

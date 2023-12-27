@@ -39,6 +39,8 @@ class SupplierModel(models.Model):
     original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True, blank=True)
     original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True, blank=True)
     original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_livestream = models.DecimalField(verbose_name='Org. cost - LiveStream', decimal_places=0, max_digits=20, null=True, blank=True)
+
     kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
     kpi_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
 
@@ -70,15 +72,15 @@ class SupplierModel(models.Model):
     def kol_tier_detect(self):
         number = int(self.follower_2)
         if number in range(0, 10000):
-            return "Nano influencer"
+            return "Nano"
         elif number in range(10000, 50000):
-            return "Micro influencer"
+            return "Micro"
         elif number in range(50000, 500000):
-            return "Mid tier influencer"
+            return "Mid tier"
         elif number in range(500000, 1000000):
-            return "Macro influencer"
+            return "Macro"
         elif number >= 1000000:
-            return "Mega influencer"
+            return "Mega"
         else:
             return "Unknown"
 
@@ -195,6 +197,7 @@ class SupplierModel(models.Model):
             'ORIGINAL COST - VIDEO':int(self.original_cost_video or 0),
             'ORIGINAL COST - EVENT': int(self.original_cost_event or 0),
             'ORIGINAL COST - TVC':int(self.original_cost_tvc or 0),
+            'ORIGINAL COST - LIVESTREAM':int(self.original_cost_livestream or 0),
             'KPI': self.kpi,
             'Note': self.note,
             'SUPPLIER NAME': self.supplier_name,
