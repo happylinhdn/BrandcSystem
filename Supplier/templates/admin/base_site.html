@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% block extrahead %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* :root {
             --primary: red;
@@ -13,4 +14,14 @@
             color: white;
         } */
     </style>
+
+    <script>
+        $(document).ready(function() {
+            console.log("load here")
+            $('body').on('copy', function(e) {
+                e.preventDefault();
+                alert("Hello! Cant not copy here.");
+            });
+        });
+    </script>
 {% endblock %}

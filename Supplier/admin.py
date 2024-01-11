@@ -62,8 +62,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
     'location', 'year_display', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display','original_cost_livestream_display',
-    'kpi', 'note', 'supplier_name', 'booking_contact', 'profile_display', 'latest_update', 'handle_by', 'group_chat_name',
-    'group_chat_channel', 'lana_leader' , 'modified_by'
+    'kpi'
     ]
     list_display_links  = ['name',]
     list_filter = [KPIRangeFilter, CostRangeFilter, 'kol_tier', 'handle_by', 'gender', 'channel', IndustryFilter, YearRangeFilter, 'location']
@@ -74,17 +73,23 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     def original_cost_video_display(self, obj):
         return "{:,}".format(obj.original_cost_video or 0)
+    original_cost_video_display.short_description = 'ORG. COST - VIDEO'
     
     def original_cost_picture_display(self, obj):
         return "{:,}".format(obj.original_cost_picture or 0)
+    original_cost_picture_display.short_description = 'ORG. COST - PICTURE'
     
     def original_cost_event_display(self, obj):
         return "{:,}".format(obj.original_cost_event or 0)
+    original_cost_event_display.short_description = 'ORG. COST - EVENT'
+
     def original_cost_tvc_display(self, obj):
         return "{:,}".format(obj.original_cost_tvc or 0)
+    original_cost_tvc_display.short_description = 'ORG. COST - TVC'
     
     def original_cost_livestream_display(self, obj):
         return "{:,}".format(obj.original_cost_livestream or 0)
+    original_cost_livestream_display.short_description = 'ORG. COST - LIVESTREAM'
     
 
     def booking_contact(self, obj):

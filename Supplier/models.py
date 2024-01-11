@@ -72,15 +72,15 @@ class SupplierModel(models.Model):
     def kol_tier_detect(self):
         number = int(self.follower_2)
         if number in range(0, 10000):
-            return "Nano"
+            return "Nano(1 - 10K)"
         elif number in range(10000, 50000):
-            return "Micro"
+            return "Micro(10K - 50K)"
         elif number in range(50000, 500000):
-            return "Mid tier"
+            return "Mid tier(50K - 500K)"
         elif number in range(500000, 1000000):
-            return "Macro"
+            return "Macro(500K - 1M)"
         elif number >= 1000000:
-            return "Mega"
+            return "Mega(1M+)"
         else:
             return "Unknown"
 
@@ -185,7 +185,7 @@ class SupplierModel(models.Model):
             'NAME': self.name,
             'LINK': self.link,
             'CHANNEL': self.channel,
-            'FOLLOWER': self.follower,
+            'FOLLOWER': int(self.follower_2 or 0),#self.follower,
             'KOL TIER': self.kol_tier,
             'ER(%)': self.engagement_rate_percent,
             'ER (Ab.)': self.parse_num(self.engagement_rate_absolute), #self.engagement_rate_absolute_display_calc(),

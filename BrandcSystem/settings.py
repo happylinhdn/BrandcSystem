@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'Supplier',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'multiselectfield',
-    'Supplier',
     'import_export',
     'django_crontab',
     'siteconfig'
@@ -62,7 +62,9 @@ ROOT_URLCONF = 'BrandcSystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -159,7 +161,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 USE_THOUSAND_SEPARATOR = True
 
 EXPORT_RECORDS_LIMIT = 100
-EXPORT_RECORDS_ADMIN_LIMIT = 1000
+EXPORT_RECORDS_ADMIN_LIMIT = 5000
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 IMPORT_EXPORT_CHUNK_SIZE = 100

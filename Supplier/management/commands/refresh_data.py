@@ -10,5 +10,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('All Supplier is "%s"' % count))
         all_suppliers = SupplierModel.objects.all().order_by('id')
         for supplier in all_suppliers:
-            supplier.handle_by = "BrandCBuyer"
+            # supplier.handle_by = "BrandCBuyer"
             supplier.save()
