@@ -46,7 +46,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     fieldsets = (
         ('ABOUT KOL', {
-            'fields': ('name', ('link', 'channel','follower') , 'engagement_rate_percent', ('location', 'year_of_birth', 'gender'), 'industries')
+            'fields': ('name', ('link', 'channel','follower') , 'engagement_rate_percent', ('location', 'year_of_birth', 'year_category', 'gender'), 'industries')
         }),
         ('ABOUT SUPPLIER', {
             'fields': (
@@ -62,10 +62,10 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
     'location', 'year_display', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display','original_cost_livestream_display',
-    'kpi'
+    'kpi', 'year_category'
     ]
     list_display_links  = ['name',]
-    list_filter = [KPIRangeFilter, CostRangeFilter, 'kol_tier', 'handle_by', 'gender', 'channel', IndustryFilter, YearRangeFilter, 'location']
+    list_filter = [KPIRangeFilter, CostRangeFilter, 'kol_tier', 'handle_by', 'year_category', 'gender', 'channel', IndustryFilter, YearRangeFilter, 'location']
     search_fields = ['name', 'link']
     list_per_page = 25
     actions = ['export_as_xls', 'sync_follower']

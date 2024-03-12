@@ -262,3 +262,9 @@ def isFbChannel(channel):
         return True
 
     return False
+
+class YearCategory(models.TextChoices):
+    GenZ = 'Gen Z (1997 - 2012)', _('Gen Z (1997 - 2012)')
+    GenY = 'Gen Y (1981 - 1996)', _('Gen Y (1981 - 1996)')
+    GenX = 'Gen X (1965 - 1980)', _('Gen X (1965 - 1980)')
+    General = 'General', _('General')

@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
-from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh
+from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh, YearCategory
 from django.contrib import messages
 from Supplier.utility import *
 from Supplier.utility_numbers import *
@@ -67,6 +67,7 @@ class SupplierModel(models.Model):
     #History
     history = models.DateTimeField(auto_now_add=True, null=True)
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, blank=True)
+    year_category = models.CharField(max_length=20, choices=YearCategory.choices, null=True, blank=True)
 
 
     def kol_tier_detect(self):
