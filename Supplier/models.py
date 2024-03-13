@@ -23,14 +23,6 @@ class SupplierModel(models.Model):
     engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
 
     location = models.CharField(max_length=20, choices=Location.choices, null=True )
-    year_of_birth = models.IntegerField(
-        null=True,
-        validators=[
-            MaxValueValidator(2030),
-            MinValueValidator(1900)
-        ],
-        blank=True
-        )
     gender = models.CharField(max_length=10, choices=Gender.choices, null=True)
     
     industries = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
@@ -67,7 +59,7 @@ class SupplierModel(models.Model):
     #History
     history = models.DateTimeField(auto_now_add=True, null=True)
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, blank=True)
-    year_category = models.CharField(max_length=20, choices=YearCategory.choices, null=True, blank=True)
+    year_category = models.CharField(verbose_name='Year', max_length=20, choices=YearCategory.choices, null=True, blank=True)
 
 
     def kol_tier_detect(self):
@@ -191,7 +183,7 @@ class SupplierModel(models.Model):
             'ER(%)': self.engagement_rate_percent,
             'ER (Ab.)': self.parse_num(self.engagement_rate_absolute), #self.engagement_rate_absolute_display_calc(),
             'LOCATION': self.location,
-            'YEAR': self.year_of_birth,
+            'YEAR': self.year_category,
             'GENDER': self.gender,
             'INDUSTRIES': self.industries,
             'ORIGINAL COST - PICTURE': int(self.original_cost_picture or 0),
@@ -242,14 +234,6 @@ class DummyModel(models.Model):
     engagement_rate_absolute = models.FloatField(verbose_name='ER (Ab.)', editable=False, null=True)
 
     location = models.CharField(max_length=20, choices=Location.choices, null=True )
-    year_of_birth = models.IntegerField(
-        null=True,
-        validators=[
-            MaxValueValidator(2030),
-            MinValueValidator(1900)
-        ],
-        blank=True
-        )
     gender = models.CharField(max_length=10, choices=Gender.choices, null=True)
     
     industries = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)

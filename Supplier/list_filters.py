@@ -416,37 +416,37 @@ class CostRangeFilter(SimpleListFilter):
                 | queryset.filter(original_cost_event__gte=p100) \
                 | queryset.filter(original_cost_tvc__gte=p100) 
 
-class YearRangeFilter(SimpleListFilter):
-    title = 'Year Range' # or use _('country') for translated title
-    parameter_name = 'year_range'
+# class YearRangeFilter(SimpleListFilter):
+#     title = 'Year Range' # or use _('country') for translated title
+#     parameter_name = 'year_range'
 
-    def lookups(self, request, model_admin):
-        return (
-          ('1', _('Before 1980')),
-          ('2', _('1981-1990')),
-          ('3', _('1991-2000')),
-          ('4', _('After 2000')),
-       )
+#     def lookups(self, request, model_admin):
+#         return (
+#           ('1', _('Before 1980')),
+#           ('2', _('1981-1990')),
+#           ('3', _('1991-2000')),
+#           ('4', _('After 2000')),
+#        )
 
-    def queryset(self, request, queryset):
-        # to decide how to filter the queryset.
-        # return queryset.filter(fields__contains=self.value())
-        p1980 = 1980
-        p1981 = 1981
-        p1990 = 1990
-        p1991 = 1991
-        p2000 = 2000
-        p2001 = 2001
-        if self.value() == '1':
-            return queryset.filter(year_of_birth__lte=p1980)
+#     def queryset(self, request, queryset):
+#         # to decide how to filter the queryset.
+#         # return queryset.filter(fields__contains=self.value())
+#         p1980 = 1980
+#         p1981 = 1981
+#         p1990 = 1990
+#         p1991 = 1991
+#         p2000 = 2000
+#         p2001 = 2001
+#         if self.value() == '1':
+#             return queryset.filter(year_of_birth__lte=p1980)
 
-        if self.value() == '2':
-            return queryset.filter(year_of_birth__gte=p1981, year_of_birth__lte=p1990)
+#         if self.value() == '2':
+#             return queryset.filter(year_of_birth__gte=p1981, year_of_birth__lte=p1990)
                 
-        if self.value() == '3':
-            return queryset.filter(year_of_birth__gte=p1991, year_of_birth__lte=p2000)
-        if self.value() == '4':
-            return queryset.filter(year_of_birth__gte=p2001)
+#         if self.value() == '3':
+#             return queryset.filter(year_of_birth__gte=p1991, year_of_birth__lte=p2000)
+#         if self.value() == '4':
+#             return queryset.filter(year_of_birth__gte=p2001)
 
 class KPIRangeFilter(SimpleListFilter):
     title = 'KPI'

@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext as _
 from .models import SupplierModel
-from .list_filters import IndustryFilter, CostRangeFilter, YearRangeFilter, KPIRangeFilter
+from .list_filters import IndustryFilter, CostRangeFilter, KPIRangeFilter
 from .forms import SupplierForm
 from .actions import ExportCsvMixin
 from .resources import SupplierResource
@@ -46,7 +46,7 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     fieldsets = (
         ('ABOUT KOL', {
-            'fields': ('name', ('link', 'channel','follower') , 'engagement_rate_percent', ('location', 'year_of_birth', 'year_category', 'gender'), 'industries')
+            'fields': ('name', ('link', 'channel','follower') , 'engagement_rate_percent', ('location', 'year_category', 'gender'), 'industries')
         }),
         ('ABOUT SUPPLIER', {
             'fields': (
@@ -61,11 +61,11 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     )
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
-    'location', 'year_display', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display','original_cost_livestream_display',
-    'kpi', 'year_category'
+    'location', 'year_category', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display','original_cost_livestream_display',
+    'kpi'
     ]
     list_display_links  = ['name',]
-    list_filter = [KPIRangeFilter, CostRangeFilter, 'kol_tier', 'handle_by', 'year_category', 'gender', 'channel', IndustryFilter, YearRangeFilter, 'location']
+    list_filter = [KPIRangeFilter, CostRangeFilter, 'kol_tier', 'handle_by', 'year_category', 'gender', 'channel', IndustryFilter, 'location']
     search_fields = ['name', 'link']
     list_per_page = 25
     actions = ['export_as_xls', 'sync_follower']
@@ -100,12 +100,6 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
             return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=obj.profile, name='Link')
         return "-"
     profile_display.short_description = 'PROFILE/QUOTATION'
-
-    def year_display(self, obj):
-        if obj.year_of_birth:
-            return "{0}".format(obj.year_of_birth)
-        return "-"
-    year_display.short_description = 'Year'
 
     def channel_display(self, obj):
         return format_html("<a href='{url}'  target='_blank' >{name}</a>", url=obj.link, name=obj.channel)

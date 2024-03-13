@@ -67,7 +67,7 @@ def update_supplier(supplier, d):
     supplier.follower = d[4]
     supplier.engagement_rate_percent = d[5]
     supplier.location = d[6]
-    supplier.year_of_birth = d[7]
+    supplier.year_category = d[7]
     supplier.gender = d[8]
     supplier.industries = d[9]
     supplier.original_cost_picture = d[10]
