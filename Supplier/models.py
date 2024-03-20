@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
-from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh, YearCategory
+from .supportmodels import Fields, Location, SupplierChannel, Gender, Kenh, YearCategory, ContractCategory
 from django.contrib import messages
 from Supplier.utility import *
 from Supplier.utility_numbers import *
@@ -27,11 +27,12 @@ class SupplierModel(models.Model):
     
     industries = MultiSelectField(choices=Fields.choices, max_choices=10, max_length=500, null=True)
     #ORIGINAL COST
-    original_cost_picture = models.DecimalField(verbose_name='Org. cost - Picture', decimal_places=0, max_digits=20, null=True, blank=True)
-    original_cost_video = models.DecimalField(verbose_name='Org. cost - Video', decimal_places=0, max_digits=20, null=True, blank=True)
-    original_cost_event = models.DecimalField(verbose_name='Org. cost - Event', decimal_places=0, max_digits=20,  null=True, blank=True)
-    original_cost_tvc = models.DecimalField(verbose_name='Org. cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
-    original_cost_livestream = models.DecimalField(verbose_name='Org. cost - LiveStream', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_picture = models.DecimalField(verbose_name='Cost - Picture', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_video = models.DecimalField(verbose_name='Cost - Video', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_event = models.DecimalField(verbose_name='Cost - Event', decimal_places=0, max_digits=20,  null=True, blank=True)
+    original_cost_tvc = models.DecimalField(verbose_name='Cost - TVC', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_livestream = models.DecimalField(verbose_name='Cost - LiveStream', decimal_places=0, max_digits=20, null=True, blank=True)
+    original_cost_sdha = models.DecimalField(verbose_name='Cost - SDHA', decimal_places=0, max_digits=20, null=True, blank=True)
 
     kpi = models.CharField(verbose_name='KPI', max_length=150, null=True)
     kpi_2 = models.DecimalField(editable=False, null=True, decimal_places=0, max_digits=20,)
@@ -59,7 +60,8 @@ class SupplierModel(models.Model):
     #History
     history = models.DateTimeField(auto_now_add=True, null=True)
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, blank=True)
-    year_category = models.CharField(verbose_name='Year', max_length=20, choices=YearCategory.choices, null=True, blank=True)
+    year_category = models.CharField(verbose_name='Gen', max_length=20, choices=YearCategory.choices, null=True, blank=True)
+    contract_category = models.CharField(verbose_name='Contract', max_length=10, choices=ContractCategory.choices, null=True, blank=True)
 
 
     def kol_tier_detect(self):
@@ -191,6 +193,7 @@ class SupplierModel(models.Model):
             'ORIGINAL COST - EVENT': int(self.original_cost_event or 0),
             'ORIGINAL COST - TVC':int(self.original_cost_tvc or 0),
             'ORIGINAL COST - LIVESTREAM':int(self.original_cost_livestream or 0),
+            'ORIGINAL COST - SHHA':int(self.original_cost_sdha or 0),
             'KPI': self.kpi,
             'Note': self.note,
             'SUPPLIER NAME': self.supplier_name,

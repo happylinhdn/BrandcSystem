@@ -50,10 +50,12 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
         }),
         ('ABOUT SUPPLIER', {
             'fields': (
-                ('original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc', 'original_cost_livestream'), 
+                ('original_cost_picture', 'original_cost_video', 'original_cost_event', 'original_cost_tvc', 'original_cost_livestream', 'original_cost_sdha'), 
                 ('kpi', 'note'), 
-                ('supplier_name', 
-                'booking_contact_name', 'booking_contact_phone', 'booking_contact_email'), 'profile', 'latest_update')
+                ('supplier_name', 'booking_contact_name', 'booking_contact_phone', 'booking_contact_email'), 
+                'profile', 'latest_update', 'contract_category'
+                ),
+                
         }),
         ('ABOUT INTERNAL TEAM', {
             'fields': ('handle_by', ('group_chat_name', 'group_chat_channel'), 'lana_leader', 'modified_by')
@@ -61,8 +63,8 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
     )
 
     list_display = ['id', 'name', 'channel_display', 'follower', 'kol_tier', 'engagement_rate_percent', 'engagement_rate_absolute_display', 
-    'location', 'year_category', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display','original_cost_livestream_display',
-    'kpi'
+    'location', 'year_category', 'gender', 'industries', 'original_cost_picture_display', 'original_cost_video_display', 'original_cost_event_display', 'original_cost_tvc_display',
+    'original_cost_livestream_display', 'original_cost_sdha_display', 'kpi'
     ]
     list_display_links  = ['name',]
     list_filter = [KPIRangeFilter, CostRangeFilter, 'kol_tier', 'handle_by', 'year_category', 'gender', 'channel', IndustryFilter, 'location']
@@ -73,23 +75,27 @@ class SupplierAdmin(ImportMixin, admin.ModelAdmin, ExportCsvMixin):
 
     def original_cost_video_display(self, obj):
         return "{:,}".format(obj.original_cost_video or 0)
-    original_cost_video_display.short_description = 'ORG. COST - VIDEO'
+    original_cost_video_display.short_description = 'COST - VIDEO'
     
     def original_cost_picture_display(self, obj):
         return "{:,}".format(obj.original_cost_picture or 0)
-    original_cost_picture_display.short_description = 'ORG. COST - PICTURE'
+    original_cost_picture_display.short_description = 'COST - PICTURE'
     
     def original_cost_event_display(self, obj):
         return "{:,}".format(obj.original_cost_event or 0)
-    original_cost_event_display.short_description = 'ORG. COST - EVENT'
+    original_cost_event_display.short_description = 'COST - EVENT'
 
     def original_cost_tvc_display(self, obj):
         return "{:,}".format(obj.original_cost_tvc or 0)
-    original_cost_tvc_display.short_description = 'ORG. COST - TVC'
+    original_cost_tvc_display.short_description = 'COST - TVC'
     
     def original_cost_livestream_display(self, obj):
         return "{:,}".format(obj.original_cost_livestream or 0)
-    original_cost_livestream_display.short_description = 'ORG. COST - LIVESTREAM'
+    original_cost_livestream_display.short_description = 'COST - LIVESTREAM'
+
+    def original_cost_sdha_display(self, obj):
+        return "{:,}".format(obj.original_cost_sdha or 0)
+    original_cost_sdha_display.short_description = 'COST - SDHA'
     
 
     def booking_contact(self, obj):

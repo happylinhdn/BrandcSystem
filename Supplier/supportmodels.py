@@ -154,7 +154,7 @@ class Location(models.TextChoices):
     HP='Hải Phòng', _('Hải Phòng')
     HGI='Hậu Giang', _('Hậu Giang')
     HB='Hòa Bình', _('Hòa Bình')
-    SG='Hồ Chí Minh', _('Thành phố Hồ Chí Minh')
+    SG='Hồ Chí Minh', _('HCM')
     HY='Hưng Yên', _('Hưng Yên')
     KH='Khánh Hòa', _('Khánh Hòa')
     KG='Kiên Giang', _('Kiên Giang')
@@ -268,3 +268,8 @@ class YearCategory(models.TextChoices):
     GenY = 'Gen Y (1981 - 1996)', _('Gen Y (1981 - 1996)')
     GenX = 'Gen X (1965 - 1980)', _('Gen X (1965 - 1980)')
     General = 'General', _('General')
+
+class ContractCategory(models.TextChoices):
+    Personal = 'Personal', _('Personal')
+    Company = 'Company', _('Company')
+    General = 'None', _('None')
